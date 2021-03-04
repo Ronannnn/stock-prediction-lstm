@@ -10,6 +10,7 @@ class DataLoader:
                  train_test_split_ratio,
                  cols,
                  seq_len,
+                 batch_size,
                  normalise,
                  start="2019-01-01",
                  end="2020-01-01"):
@@ -22,24 +23,42 @@ class DataLoader:
         self.train_len = len(self.train_data)
         self.test_len = len(self.test_data)
         self.seq_len = seq_len
+        self.batch_size = batch_size
         self.normalize = normalise
 
-    def get_windowed_train_data(self, normalize):
-        return self.get_windowed_data(self.train_data, normalize)
+    def get_windowed_train_data(self):
+        return self.get_windowed_data(self.train_data)
 
-    def get_windowed_test_data(self, normalize):
-        return self.get_windowed_data(self.test_data, normalize)
+    def get_windowed_test_data(self):
+        return self.get_windowed_data(self.test_data)
 
-    def get_windowed_data(self, data, normalize):
+    def get_windowed_data(self, data):
         windowed_data = []
         for i in range(len(data) - self.seq_len + 1):
             windowed_data.append(data[i:i + self.seq_len])
         # normalization
-        windowed_data = self.normalize_windows(windowed_data) if normalize else windowed_data
+        windowed_data = self.normalize_windows(windowed_data) if self.normalize else np.array(windowed_data)
         # https://www.pythoninformer.com/python-libraries/numpy/index-and-slice/
         x = windowed_data[:, :-1]
         y = windowed_data[:, -1, [0]]
         return x, y
+
+    def generate_train_batch(self):
+        i = 0
+        while i < (self.train_len - self.seq_len + 1):
+            x_batch = []
+            y_batch = []
+            for b in range(self.batch_size):
+                if i >= (self.train_len - self.seq_len + 1):
+                    # stop-condition for a smaller final batch if data doesn't divide evenly
+                    yield np.array(x_batch), np.array(y_batch)
+                    i = 0
+                window = self.train_data[i:i + self.seq_len]
+                window = self.normalize_windows(window) if self.normalize else np.array(window)
+                x_batch.append(window[:-1])
+                y_batch.append(window[-1, [0]])
+                i += 1
+            yield np.array(x_batch), np.array(y_batch)
 
     @staticmethod
     def normalize_windows(windowed_data):
@@ -55,8 +74,3 @@ class DataLoader:
 
     def fetch_interest_rate(self, country):
         return 1
-
-
-if __name__ == '__main__':
-    loader1 = DataLoader("GOOGL", 0.5, ["Close", "Volume"], 4, True, "2020-01-01", "2020-01-16")
-

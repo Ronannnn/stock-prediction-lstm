@@ -11,3 +11,8 @@
     1. data smoothing
     2. feature extraction
     3. feature selection
+
+
+Extra:
+1. dim == features i.e. number of columns
+2. time steps == sequence length - 1 since the last one is used as y
