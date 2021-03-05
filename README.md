@@ -12,7 +12,11 @@
     2. feature extraction
     3. feature selection
 
+#### Stock Codes
+http://vip.stock.finance.sina.com.cn/usstock/ustotal.php
+Google GOOGL
 
-Extra:
+#### Extra:
 1. dim == features i.e. number of columns
 2. time steps == sequence length - 1 since the last one is used as y
+

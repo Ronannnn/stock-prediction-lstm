@@ -43,6 +43,7 @@ class DataLoader:
         y = windowed_data[:, -1, [0]]
         return x, y
 
+    # todo runtime error
     def generate_train_batch(self):
         i = 0
         while i < (self.train_len - self.seq_len + 1):
