@@ -25,7 +25,8 @@
   },
   "models": [
     {
-      "feasible": true,
+      "name": "from_github",
+      "include": true,
       "loss": "mse",
       "optimizer": "adam",
       "layers": [
@@ -62,7 +63,8 @@
       ]
     },
     {
-      "feasible": true,
+      "name": "lstms",
+      "include": false,
       "loss": "mse",
       "optimizer": "adam",
       "layers": [

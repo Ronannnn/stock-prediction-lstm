@@ -51,7 +51,7 @@ def main():
 
     # build models
     for model_config in configs['models']:
-        if model_config['feasible'] is False:
+        if model_config['include'] is False:
             continue
         model = Model()
         model.build(model_config)
