@@ -25,6 +25,7 @@
   },
   "models": [
     {
+      "feasible": true,
       "loss": "mse",
       "optimizer": "adam",
       "layers": [
@@ -61,6 +62,7 @@
       ]
     },
     {
+      "feasible": true,
       "loss": "mse",
       "optimizer": "adam",
       "layers": [

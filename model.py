@@ -7,8 +7,6 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 from utils import Timer
 
-import numpy as np
-
 
 class Model:
     def __init__(self):

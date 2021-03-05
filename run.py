@@ -49,24 +49,28 @@ def main():
         end=configs['data']['end']
     )
 
-    model = Model()
-    model.build(configs['models'][0])
+    # build models
+    for model_config in configs['models']:
+        if model_config['feasible'] is False:
+            continue
+        model = Model()
+        model.build(model_config)
 
-    x, y = data.get_windowed_train_data()
-    model.train(x, y, configs['train']['epochs'], batch_size, configs['data']['save_dir'])
+        x, y = data.get_windowed_train_data()
+        model.train(x, y, configs['train']['epochs'], batch_size, configs['data']['save_dir'])
 
-    # model.train_generator(
-    #     data_generator=data.generate_train_batch(),
-    #     epochs=configs['train']['epochs'],
-    #     batch_size=batch_size,
-    #     steps_per_epoch=math.ceil((data.train_len - seq_len) / batch_size),
-    #     save_dir=configs['data']['save_dir']
-    # )
+        # model.train_generator(
+        #     data_generator=data.generate_train_batch(),
+        #     epochs=configs['train']['epochs'],
+        #     batch_size=batch_size,
+        #     steps_per_epoch=math.ceil((data.train_len - seq_len) / batch_size),
+        #     save_dir=configs['data']['save_dir']
+        # )
 
-    x_test, y_test = data.get_windowed_test_data()
-    predictions = model.predict(x_test, batch_size=batch_size)
+        x_test, y_test = data.get_windowed_test_data()
+        predictions = model.predict(x_test, batch_size=batch_size)
 
-    plot_results(predictions, y_test)
+        plot_results(predictions, y_test)
 
 
 if __name__ == '__main__':
