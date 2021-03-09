@@ -14,27 +14,28 @@
       "Close",
       "Volume"
     ],
-    "sequence_length": 50,
+    "sequence_length": 60,
+    "predicted_days": 30,
     "normalize": true,
-    "start": "2015-01-01",
-    "end": "2020-01-01",
+    "start": "2010-01-01",
+    "end": "2021-01-01",
     "save_dir": "saved_models"
   },
   "train": {
-    "epochs": 8,
+    "epochs": 10,
     "batch_size": 32
   },
   "models": [
     {
       "name": "from_github",
-      "include": true,
+      "include": false,
       "loss": "mse",
       "optimizer": "adam",
       "layers": [
         {
           "type": "lstm",
-          "neuron_num": 100,
-          "input_timesteps": 49,
+          "neuron_num": 180,
+          "input_timesteps": 30,
           "input_dim": 3,
           "return_seq": true
         },
@@ -65,20 +66,20 @@
     },
     {
       "name": "lstms",
-      "include": false,
+      "include": true,
       "loss": "mse",
       "optimizer": "adam",
       "layers": [
         {
           "type": "lstm",
           "neuron_num": 100,
-          "input_timesteps": 49,
+          "input_timesteps": 30,
           "input_dim": 3,
           "return_seq": false
         },
         {
           "type": "dense",
-          "neuron_num": 1,
+          "neuron_num": 30,
           "activation": "linear"
         }
       ]

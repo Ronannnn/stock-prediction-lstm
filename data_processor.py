@@ -1,7 +1,7 @@
 import numpy as np
+import pandas as pd
 import yfinance as yf
 from sklearn.preprocessing import MinMaxScaler
-import pandas as pd
 
 
 class DataLoader:
@@ -11,19 +11,21 @@ class DataLoader:
                  train_test_split_ratio,
                  cols,
                  seq_len,
+                 predicted_days,
                  batch_size,
                  normalise,
-                 start="2019-01-01",
-                 end="2020-01-01"):
+                 start,
+                 end):
         # todo check if already in db
         # todo set proper start and end
         df = yf.download(stock_code, start=start, end=end)
         split_num = int(len(df) * train_test_split_ratio)
-        self.train_data = df.get(cols).values[:split_num]
-        self.test_data = df.get(cols).values[split_num:]
+        self.train_data = df.get(cols)[:split_num]
+        self.test_data = df.get(cols)[split_num:]
         self.train_len = len(self.train_data)
         self.test_len = len(self.test_data)
         self.seq_len = seq_len
+        self.predicted_days = predicted_days
         self.batch_size = batch_size
         self.normalize = normalise
 
@@ -33,16 +35,34 @@ class DataLoader:
     def get_windowed_test_data(self):
         return self.get_windowed_data(self.test_data)
 
-    def get_windowed_data(self, data):
+    def get_predict_data(self):
         windowed_data = []
-        for i in range(len(data) - self.seq_len + 1):
-            windowed_data.append(data[i:i + self.seq_len])
+        time_idx = []
+        print(self.test_len)
+        for i in range(self.test_len - self.seq_len, -1, -self.predicted_days):
+            sub_data = self.test_data[i:i + self.seq_len]
+            windowed_data.append(sub_data)
+            time_idx.append(list(sub_data.index.values[-self.predicted_days:]))
         # normalization
         windowed_data = self.normalize_windows(windowed_data) if self.normalize else np.array(windowed_data)
         # https://www.pythoninformer.com/python-libraries/numpy/index-and-slice/
-        x = windowed_data[:, :-1]
-        y = windowed_data[:, -1, [0]]
-        return x, y
+        x = windowed_data[:, :-self.predicted_days]
+        y = windowed_data[:, -self.predicted_days:, [0]]
+        return x, y, time_idx
+
+    def get_windowed_data(self, data):
+        windowed_data = []
+        time_idx = []
+        for i in range(len(data) - self.seq_len + 1):
+            sub_data = data[i:i + self.seq_len]
+            windowed_data.append(sub_data)
+            time_idx.append(list(sub_data.index.values[-self.predicted_days:]))
+        # normalization
+        windowed_data = self.normalize_windows(windowed_data) if self.normalize else np.array(windowed_data)
+        # https://www.pythoninformer.com/python-libraries/numpy/index-and-slice/
+        x = windowed_data[:, :-self.predicted_days]
+        y = windowed_data[:, -self.predicted_days:, [0]]
+        return x, y, time_idx
 
     # todo runtime error
     def generate_train_batch(self):

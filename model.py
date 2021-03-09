@@ -79,7 +79,7 @@ class Model:
         print('[Model] Training Completed. Model saved as %s' % save_filename)
         timer.stop()
 
-    def predict(self, data, batch_size):
+    def predict(self, data, batch_size=None):
         # Shift the window by 1 new prediction each time, re-run predictions on new window
         print('[Model] Predicting...')
         return self.model.predict(data, batch_size=batch_size)

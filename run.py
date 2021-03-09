@@ -1,18 +1,27 @@
 import json
 import os
 
-import math
 import matplotlib.pyplot as plt
 
 from data_processor import DataLoader
 from model import Model
 
 
-def plot_results(predicted_data, true_data):
+def plot_results(predicted_data, true_data, time_idx):
+    for i in range(len(predicted_data)):
+        plot_result(predicted_data[i], true_data[i], time_idx[i])
+
+
+def plot_last_results(predicted_data, true_data, time_idx, num):
+    for idx in range(len(predicted_data) - num, len(predicted_data)):
+        plot_result(predicted_data[idx], true_data[idx], time_idx[idx])
+
+
+def plot_result(predicted_data, true_data, time_idx):
     fig = plt.figure(facecolor='white')
     ax = fig.add_subplot(111)
-    ax.plot(true_data, label='True Data')
-    plt.plot(predicted_data, label='Prediction')
+    ax.plot(time_idx, true_data, label='True Data')
+    plt.plot(time_idx, predicted_data, label='Prediction')
     plt.legend()
     plt.show()
 
@@ -29,7 +38,7 @@ def plot_results_multiple(predicted_data, true_data, prediction_len):
     plt.show()
 
 
-def main():
+def train():
     configs = json.load(open('config.json', 'r'))
     if not os.path.exists(configs['data']['save_dir']):
         os.makedirs(configs['data']['save_dir'])
@@ -43,6 +52,7 @@ def main():
         train_test_split_ratio=configs['data']['train_test_split'],
         cols=configs['data']['columns'],
         seq_len=seq_len,
+        predicted_days=configs['data']['predicted_days'],
         batch_size=batch_size,
         normalise=configs['data']['normalize'],
         start=configs['data']['start'],
@@ -56,7 +66,7 @@ def main():
         model = Model()
         model.build(model_config)
 
-        x, y = data.get_windowed_train_data()
+        x, y, _ = data.get_windowed_train_data()
         model.train(x, y, configs['train']['epochs'], batch_size, configs['data']['save_dir'])
 
         # model.train_generator(
@@ -67,11 +77,19 @@ def main():
         #     save_dir=configs['data']['save_dir']
         # )
 
-        x_test, y_test = data.get_windowed_test_data()
-        predictions = model.predict(x_test, batch_size=batch_size)
+        # x_test, y_test, time_idx = data.get_windowed_test_data()
+        # predictions = model.predict(x_test, batch_size=batch_size)
+        # plot_last_results(predictions, y_test, time_idx, 5)
 
-        plot_results(predictions, y_test)
+        x_test, y_test, time_idx = data.get_predict_data()
+        predictions = model.predict(x_test, batch_size=batch_size)
+        plot_last_results(predictions, y_test, time_idx, 5)
 
 
 if __name__ == '__main__':
-    main()
+    # df = pd.read_csv('data.csv', index_col=0)
+    # df = df.get(["Open"])
+    # print(df)
+    # print(list(df.index.values))
+    train()
+
