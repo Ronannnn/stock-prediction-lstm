@@ -1,6 +1,7 @@
 import numpy as np
 import yfinance as yf
 from sklearn.preprocessing import MinMaxScaler
+import pandas as pd
 
 
 class DataLoader:
@@ -69,6 +70,17 @@ class DataLoader:
             scaler.fit(window)
             res.append(scaler.transform(window))
         return np.array(res)
+
+    # db interaction
+    def fix_range(self, stock_code, start, end):
+        """
+        Check if those data of this stock is already in db
+        if not, fetch from yfinance api
+        """
+        return False
+
+    def fetch_from_db(self, stock_codes, start, end):
+        return pd.DataFrame
 
     def fetch_us_dollar_idx(self):
         return 1

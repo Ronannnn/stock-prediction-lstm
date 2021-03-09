@@ -3,7 +3,8 @@
     "host": "localhost",
     "user": "root",
     "password": "699685",
-    "raise_on_warnings": true
+    "raise_on_warnings": true,
+    "database": "dsci560"
   },
   "data": {
     "stock_code": "GOOGL",
