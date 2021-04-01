@@ -38,7 +38,6 @@ class DataLoader:
     def get_predict_data(self):
         windowed_data = []
         time_idx = []
-        print(self.test_len)
         for i in range(self.test_len - self.seq_len, -1, -self.predicted_days):
             sub_data = self.test_data[i:i + self.seq_len]
             windowed_data.append(sub_data)
@@ -47,7 +46,7 @@ class DataLoader:
         windowed_data = self.normalize_windows(windowed_data) if self.normalize else np.array(windowed_data)
         # https://www.pythoninformer.com/python-libraries/numpy/index-and-slice/
         x = windowed_data[:, :-self.predicted_days]
-        y = windowed_data[:, -self.predicted_days:, [0]]
+        y = windowed_data[:, -self.predicted_days:, [1]]
         return x, y, time_idx
 
     def get_windowed_data(self, data):
@@ -61,7 +60,7 @@ class DataLoader:
         windowed_data = self.normalize_windows(windowed_data) if self.normalize else np.array(windowed_data)
         # https://www.pythoninformer.com/python-libraries/numpy/index-and-slice/
         x = windowed_data[:, :-self.predicted_days]
-        y = windowed_data[:, -self.predicted_days:, [0]]
+        y = windowed_data[:, -self.predicted_days, [0]]
         return x, y, time_idx
 
     # todo runtime error

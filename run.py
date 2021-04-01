@@ -64,10 +64,11 @@ def train():
         if model_config['include'] is False:
             continue
         model = Model()
-        model.build(model_config)
-
-        x, y, _ = data.get_windowed_train_data()
-        model.train(x, y, configs['train']['epochs'], batch_size, configs['data']['save_dir'])
+        # model.build(model_config)
+        #
+        # x, y, _ = data.get_windowed_train_data()
+        # model.train(x, y, configs['train']['epochs'], batch_size, configs['data']['save_dir'])
+        model.load("saved_models/lstms-20210402014710-e50.h5")
 
         # model.train_generator(
         #     data_generator=data.generate_train_batch(),
@@ -77,13 +78,15 @@ def train():
         #     save_dir=configs['data']['save_dir']
         # )
 
-        # x_test, y_test, time_idx = data.get_windowed_test_data()
+        x_test, y_test, time_idx = data.get_windowed_test_data()
+        predictions = model.predict(x_test, batch_size=batch_size)
+        plot_result(predictions, y_test, time_idx)
+        for i in range(len(predictions)):
+            print("['" + str(time_idx[i][0]) + "','" + str(y_test[i][0]) + "','" + str(predictions[i][0]) + "'],")
+
+        # x_test, y_test, time_idx = data.get_predict_data()
         # predictions = model.predict(x_test, batch_size=batch_size)
         # plot_last_results(predictions, y_test, time_idx, 5)
-
-        x_test, y_test, time_idx = data.get_predict_data()
-        predictions = model.predict(x_test, batch_size=batch_size)
-        plot_last_results(predictions, y_test, time_idx, 5)
 
 
 if __name__ == '__main__':
@@ -92,4 +95,3 @@ if __name__ == '__main__':
     # print(df)
     # print(list(df.index.values))
     train()
-
