@@ -4,7 +4,8 @@ import os
 import matplotlib.pyplot as plt
 
 from model.data_processor import DataLoader
-from model.model import Model
+from model.model_handler import Model
+import model.api as api
 
 
 def plot_results(predicted_data, true_data, time_idx):
@@ -39,7 +40,7 @@ def plot_results_multiple(predicted_data, true_data, prediction_len):
 
 
 def train():
-    configs = json.load(open('config.json', 'r'))
+    configs = json.load(open('model/config.json', 'r'))
     if not os.path.exists(configs['data']['save_dir']):
         os.makedirs(configs['data']['save_dir'])
 
@@ -82,7 +83,7 @@ def train():
         predictions = model.predict(x_test, batch_size=batch_size)
         plot_result(predictions, y_test, time_idx)
         for i in range(len(predictions)):
-            print("['" + str(time_idx[i][0]) + "','" + str(y_test[i][0]) + "','" + str(predictions[i][0]) + "'],")
+            print("['" + str(time_idx[i][0])[0: 10] + "','" + str(y_test[i][0]) + "','" + str(predictions[i][0]) + "'],")
 
         # x_test, y_test, time_idx = data.get_predict_data()
         # predictions = model.predict(x_test, batch_size=batch_size)
@@ -94,4 +95,5 @@ if __name__ == '__main__':
     # df = df.get(["Open"])
     # print(df)
     # print(list(df.index.values))
-    train()
+    # train()
+    print(api.get_plot_data("AAPL"))

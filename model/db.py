@@ -3,7 +3,7 @@ import pandas as pd
 from mysql.connector import errorcode
 from sqlalchemy import create_engine, inspect
 
-from utils import convert_dtypes
+from model.util import convert_dtypes
 
 TABLES = {
     'stock_idx': (

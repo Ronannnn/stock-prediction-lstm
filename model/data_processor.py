@@ -19,6 +19,8 @@ class DataLoader:
         # todo check if already in db
         # todo set proper start and end
         df = yf.download(stock_code, start=start, end=end)
+        if len(df) == 0:
+            raise Exception("No data for stock code" + stock_code)
         split_num = int(len(df) * train_test_split_ratio)
         self.train_data = df.get(cols)[:split_num]
         self.test_data = df.get(cols)[split_num:]

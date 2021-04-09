@@ -5,7 +5,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Dense, LSTM, Dropout
 from keras.models import Sequential, load_model
 
-from utils import Timer
+from model.util import Timer
 
 
 class Model:

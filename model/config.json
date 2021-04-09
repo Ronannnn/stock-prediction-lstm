@@ -12,8 +12,8 @@
     "columns": [
       "Open",
       "Close",
-      "lowest",
-      "highest"
+      "Low",
+      "High"
     ],
     "sequence_length": 50,
     "predicted_days": 1,
