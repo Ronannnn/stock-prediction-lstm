@@ -20,4 +20,5 @@ import profit_dance.api as api
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('model/', api.train),
+    path('step/', api.get_step),
 ]

@@ -13,7 +13,9 @@ class Timer:
         self.start_dt = dt.datetime.now()
 
     def stop(self):
-        print('Time taken: %s' % (dt.datetime.now() - self.start_dt))
+        res = dt.datetime.now() - self.start_dt
+        print('Time taken: %s' % res)
+        return res
 
 
 def convert_dtypes(dtypes):

@@ -16,7 +16,6 @@ class Model:
 
     def build(self, config):
         self.filename_with_dt = '%s-%s' % (config['name'], dt.datetime.now().strftime('%Y%m%d%H%M%S'))
-        timer = Timer()
         self.model = Sequential()
         for layer in config['layers']:
             neurons = layer['neuron_num'] if 'neuron_num' in layer else None
@@ -39,10 +38,8 @@ class Model:
         self.model.compile(loss=config['loss'], optimizer=config['optimizer'])
 
         print('[Model] Model Compiled')
-        timer.stop()
 
     def train(self, x, y, epochs, batch_size, save_dir):
-        timer = Timer()
         save_filename = os.path.join(save_dir, '%s-e%s.h5' % (self.filename_with_dt, str(epochs)))
         callbacks = [
             EarlyStopping(monitor='loss', patience=2),  # Stop after 2 epochs whose loss is no longer decreasing
@@ -52,7 +49,6 @@ class Model:
         print('[Model] %s epochs, %s batch size' % (epochs, batch_size))
         self.model.fit(x, y, epochs=epochs, batch_size=batch_size, callbacks=callbacks, verbose=2)
         print('[Model] Training Completed. Model saved as %s' % save_filename)
-        timer.stop()
 
     def train_generator(self, data_generator, epochs, batch_size, steps_per_epoch, save_dir):
         timer = Timer()
