@@ -3,8 +3,8 @@ import os
 
 import matplotlib.pyplot as plt
 
-from data_processor import DataLoader
-from model import Model
+from model.data_processor import DataLoader
+from model.model import Model
 
 
 def plot_results(predicted_data, true_data, time_idx):
