@@ -8,8 +8,9 @@ timer = Timer()
 
 def wrap_func(func_name, func, **args):
     timer.reset()
+    print("[Model] %s started." % func_name)
     return_val = func(**args)
-    timer.stop(msg="[Model] " + func_name)
+    timer.stop(msg="[Model] %s finished" % func_name)
     return return_val
 
 
@@ -21,7 +22,7 @@ class Model(object):
         pass
 
     @abstractmethod
-    def train(self, x, y):
+    def train(self, X, y):
         pass
 
     @abstractmethod
@@ -29,13 +30,13 @@ class Model(object):
         pass
 
     @abstractmethod
-    def predict(self, x):
+    def predict(self, X):
         pass
 
     def build_train_predict(self, x_train, y_train, x_predict):
         wrap_func("Build Stage", self.build)
-        wrap_func("Train Stage", self.train, x=x_train, y=y_train)
-        predict_data = wrap_func("Predict Stage", self.predict, x=x_predict)
+        wrap_func("Train Stage", self.train, X=x_train, y=y_train)
+        predict_data = wrap_func("Predict Stage", self.predict, X=x_predict)
         return predict_data
 
     @staticmethod

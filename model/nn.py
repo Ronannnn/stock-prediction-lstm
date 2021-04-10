@@ -58,7 +58,7 @@ class NNModel(Model):
             self.model.add(layer_dict[layer_config['type']](layer_config))
         self.model.compile(loss=self.config['loss'], optimizer=self.config['optimizer'])
 
-    def train(self, x, y):
+    def train(self, X, y):
         callbacks = [
             EarlyStopping(monitor='loss', patience=2),  # Stop after 2 epochs whose loss is no longer decreasing
             ModelCheckpoint(self.filename, monitor='loss', save_best_only=True)  # monitor is 'loss' not 'val_loss'
@@ -67,7 +67,7 @@ class NNModel(Model):
         batch_size = self.config["batch_size"]
         print('[Model] Training Started')
         print('[Model] %s epochs, %s batch size' % (epochs, batch_size))
-        self.model.fit(x, y, epochs=epochs, batch_size=batch_size, callbacks=callbacks, verbose=self.verbose)
+        self.model.fit(X, y, epochs=epochs, batch_size=batch_size, callbacks=callbacks, verbose=self.verbose)
         print('[Model] Training Completed. Model saved as %s' % self.filename)
 
     def train_with_generator(self, data_generator):
@@ -88,8 +88,8 @@ class NNModel(Model):
         )
         print('[Model] Training Completed. Model saved as %s' % self.filename)
 
-    def predict(self, x):
-        return self.model.predict(x, batch_size=self.config["batch_size"])
+    def predict(self, X):
+        return self.model.predict(X, batch_size=self.config["batch_size"])
 
 
 def nn_model_test():

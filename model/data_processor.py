@@ -18,14 +18,16 @@ class DataLoader:
         self.normalizable = config["normalizable"]
 
     def get_linear_train_data(self):
-        return self.get_linear_data(self.train_data)
+        data, time_idx = self.get_linear_data(self.train_data)
+        return [[i] for i in range(self.train_len)], data, time_idx
 
     def get_linear_test_data(self):
-        return self.get_linear_data(self.test_data)
+        data, time_idx = self.get_linear_data(self.test_data)
+        return [[i] for i in range(self.train_len, self.train_len + self.test_len, 1)], data, time_idx
 
     def get_linear_data(self, data):
         normalized_data = self.normalize_data(data) if self.normalizable else data
-        return normalized_data[:, [1]], [[i] for i in data.index.values]
+        return normalized_data[:, [1]].ravel(), [[i] for i in data.index.values]
 
     def get_windowed_train_data(self):
         return self.get_windowed_data(self.train_data)
