@@ -2,7 +2,7 @@ import json
 import os
 
 from model.data_processor import DataLoader
-from model.model_handler import Model
+from model.windowed_trainer import Model
 from model.util import Timer
 
 steps = []
@@ -20,10 +20,9 @@ def get_plot_data(stock_code):
         stock_code=configs['data']['stock_code'],
         train_test_split_ratio=configs['data']['train_test_split'],
         cols=configs['data']['columns'],
-        seq_len=configs['data']['sequence_length'],
-        predicted_days=configs['data']['predicted_days'],
-        batch_size=configs['train']['batch_size'],
-        normalise=configs['data']['normalize'],
+        days_for_predict=configs['data']['days_for_predict'],
+        days_to_predict=configs['data']['days_to_predict'],
+        normalizable=configs['data']['normalizable'],
         start=configs['data']['start'],
         end=configs['data']['end']
     )
@@ -38,13 +37,13 @@ def get_plot_data(stock_code):
     # train
     timer = Timer()
     x, y, _ = data.get_windowed_train_data()
-    model.train(x, y, configs['train']['epochs'], configs['train']['batch_size'], configs['data']['save_dir'])
+    model.train(x, y, configs['data']['epochs'], configs['data']['batch_size'], configs['data']['save_dir'])
     steps.append(timer.stop())
 
     # predict
     timer = Timer()
     x_test, y_test, time_idx = data.get_windowed_test_data()
-    predictions = model.predict(x_test, batch_size=configs['train']['batch_size'])
+    predictions = model.predict(x_test, batch_size=configs['data']['batch_size'])
     res = []
     for i in range(len(predictions)):
         res.append([str(time_idx[i][0])[0: 10], str(y_test[i][0]), str(predictions[i][0])])

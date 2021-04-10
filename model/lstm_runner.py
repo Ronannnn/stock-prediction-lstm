@@ -1,24 +1,19 @@
 import model.api as api
 from model.data_processor import DataLoader
-from model.model_handler import Model
+from model.windowed_trainer import Model
 from model.util import plot_result, load_config
 
 
 def train():
     config = load_config()
 
-    # common var
-    seq_len = config['data']['sequence_length']
-    batch_size = config['train']['batch_size']
-
     data = DataLoader(
         stock_code=config['data']['stock_code'],
         train_test_split_ratio=config['data']['train_test_split'],
         cols=config['data']['columns'],
-        seq_len=seq_len,
-        predicted_days=config['data']['predicted_days'],
-        batch_size=batch_size,
-        normalise=config['data']['normalize'],
+        days_for_predict=config['data']['days_for_predict'],
+        days_to_predict=config['data']['days_to_predict'],
+        normalizable=config['data']['normalizable'],
         start=config['data']['start'],
         end=config['data']['end']
     )
@@ -31,22 +26,19 @@ def train():
         model.build(model_config)
 
         x, y, _ = data.get_windowed_train_data()
-        model.train(x, y, config['train']['epochs'], batch_size, config['data']['save_dir'])
+        model.train(x, y, config['data']['epochs'], config['data']['batch_size'], config['data']['save_dir'])
 
         # model.train_generator(
         #     data_generator=data.generate_train_batch(),
-        #     epochs=config['train']['epochs'],
+        #     epochs=config['data']['epochs'],
         #     batch_size=batch_size,
         #     steps_per_epoch=math.ceil((data.train_len - seq_len) / batch_size),
         #     save_dir=config['data']['save_dir']
         # )
 
         x_test, y_test, time_idx = data.get_windowed_test_data()
-        predictions = model.predict(x_test, batch_size=batch_size)
+        predictions = model.predict(x_test, batch_size=config['data']['batch_size'])
         plot_result(predictions, y_test, time_idx)
-        for i in range(len(predictions)):
-            print(
-                "['" + str(time_idx[i][0])[0: 10] + "','" + str(y_test[i][0]) + "','" + str(predictions[i][0]) + "'],")
 
         # x_test, y_test, time_idx = data.get_predict_data()
         # predictions = model.predict(x_test, batch_size=batch_size)

@@ -8,23 +8,21 @@
   },
   "data": {
     "stock_code": "AAPL",
-    "train_test_split": 0.85,
+    "start": "2015-01-01",
+    "end": "2021-01-01",
     "columns": [
       "Open",
       "Close",
       "Low",
       "High"
     ],
-    "sequence_length": 50,
-    "predicted_days": 1,
-    "normalize": true,
-    "start": "2015-01-01",
-    "end": "2021-01-01",
-    "save_dir": "saved_models"
-  },
-  "train": {
+    "train_test_split": 0.85,
+    "days_for_predict": 50,
+    "days_to_predict": 1,
+    "normalizable": true,
     "epochs": 50,
-    "batch_size": 50
+    "batch_size": 50,
+    "save_dir": "saved_models"
   },
   "models": [
     {

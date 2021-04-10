@@ -20,3 +20,7 @@ Google GOOGL
 1. dim == features i.e. number of columns
 2. time steps == sequence length - 1 since the last one is used as y
 
+## Python
+
+### slice
+[Reference](https://www.pythoninformer.com/python-libraries/numpy/index-and-slice/)

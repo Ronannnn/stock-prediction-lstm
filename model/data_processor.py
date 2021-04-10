@@ -5,18 +5,15 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 class DataLoader:
-
     def __init__(self,
                  stock_code=None,
-                 train_test_split_ratio=0.75,
-                 cols=None,
-                 seq_len=50,
-                 predicted_days=1,
-                 batch_size=50,
-                 normalise=True,
                  start=None,
-                 end=None):
-        # todo check if already in db
+                 end=None,
+                 cols=None,
+                 train_test_split_ratio=0.75,
+                 days_for_predict=50,
+                 days_to_predict=1,
+                 normalizable=True):
         df = yf.download(stock_code, start=start, end=end)
         if len(df) == 0:
             raise Exception("No data for stock code" + stock_code)
@@ -25,10 +22,9 @@ class DataLoader:
         self.test_data = df.get(cols)[split_num:]
         self.train_len = len(self.train_data)
         self.test_len = len(self.test_data)
-        self.seq_len = seq_len
-        self.predicted_days = predicted_days
-        self.batch_size = batch_size
-        self.normalizable = normalise
+        self.days_for_predict = days_for_predict
+        self.days_to_predict = days_to_predict
+        self.normalizable = normalizable
 
     def get_train_data(self):
         return self.get_data(self.train_data)
@@ -52,43 +48,39 @@ class DataLoader:
     def get_windowed_predict_data(self):
         windowed_data = []
         time_idx = []
-        for i in range(self.test_len - self.seq_len, -1, -self.predicted_days):
-            sub_data = self.test_data[i:i + self.seq_len]
+        for i in range(self.test_len - self.days_for_predict, -1, -self.days_to_predict):
+            sub_data = self.test_data[i:i + self.days_for_predict]
             windowed_data.append(sub_data)
-            time_idx.append(list(sub_data.index.values[-self.predicted_days:]))
-        # normalization
+            time_idx.append(list(sub_data.index.values[-self.days_to_predict:]))
         windowed_data = self.normalize_windowed_data(windowed_data) if self.normalizable else np.array(windowed_data)
-        # https://www.pythoninformer.com/python-libraries/numpy/index-and-slice/
-        x = windowed_data[:, :-self.predicted_days]
-        y = windowed_data[:, -self.predicted_days:, [1]]
+        x = windowed_data[:, :-self.days_to_predict]
+        y = windowed_data[:, -self.days_to_predict:, [1]]
         return x, y, time_idx
 
     def get_windowed_data(self, data):
         windowed_data = []
         time_idx = []
-        for i in range(len(data) - self.seq_len + 1):
-            sub_data = data[i:i + self.seq_len]
+        for i in range(len(data) - self.days_for_predict + 1):
+            sub_data = data[i:i + self.days_for_predict]
             windowed_data.append(sub_data)
-            time_idx.append(list(sub_data.index.values[-self.predicted_days:]))
-        # normalization
+            time_idx.append(list(sub_data.index.values[-self.days_to_predict:]))
         windowed_data = self.normalize_windowed_data(windowed_data) if self.normalizable else np.array(windowed_data)
-        # https://www.pythoninformer.com/python-libraries/numpy/index-and-slice/
-        x = windowed_data[:, :-self.predicted_days]
-        y = windowed_data[:, -self.predicted_days, [1]]
+        x = windowed_data[:, :-self.days_to_predict]
+        y = windowed_data[:, -self.days_to_predict, [1]]
         return x, y, time_idx
 
     # todo runtime error
-    def generate_train_batch(self):
+    def generate_train_batch(self, batch_size):
         i = 0
-        while i < (self.train_len - self.seq_len + 1):
+        while i < (self.train_len - self.days_for_predict + 1):
             x_batch = []
             y_batch = []
-            for b in range(self.batch_size):
-                if i >= (self.train_len - self.seq_len + 1):
+            for b in range(batch_size):
+                if i >= (self.train_len - self.days_for_predict + 1):
                     # stop-condition for a smaller final batch if data doesn't divide evenly
                     yield np.array(x_batch), np.array(y_batch)
                     i = 0
-                window = self.train_data[i:i + self.seq_len]
+                window = self.train_data[i:i + self.days_for_predict]
                 window = self.normalize_windowed_data(window) if self.normalizable else np.array(window)
                 x_batch.append(window[:-1])
                 y_batch.append(window[-1, [0]])

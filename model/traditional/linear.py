@@ -13,7 +13,7 @@ def train():
         stock_code=configs['data']['stock_code'],
         train_test_split_ratio=configs['data']['train_test_split'],
         cols=configs['data']['columns'],
-        normalise=configs['data']['normalize'],
+        normalizable=configs['data']['normalizable'],
         start=configs['data']['start'],
         end=configs['data']['end']
     )
@@ -29,7 +29,7 @@ def train():
     callbacks = [
         EarlyStopping(monitor='loss', patience=2),  # Stop after 2 epochs whose loss is no longer decreasing
     ]
-    model.fit(x_train, y_train, epochs=configs['train']['epochs'], batch_size=configs['train']['batch_size'], callbacks=callbacks, verbose=2)
+    model.fit(x_train, y_train, epochs=configs['data']['epochs'], batch_size=configs['data']['batch_size'], callbacks=callbacks, verbose=2)
     x_test, y_test, time_idx = data.get_test_data()
     predict = model.predict(x_test)
     plot_result(predict, y_test, time_idx)
