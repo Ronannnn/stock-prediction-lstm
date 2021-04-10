@@ -101,10 +101,11 @@ def nn_model_test():
         model = NNModel(model_config, config['data']['save_dir'], config['data']['verbose'])
         # get data
         x_train, y_train, _ = data.get_windowed_train_data()
-        x_predict, y_true, time_idx = data.get_windowed_test_data()
+        x_pred, y_true, time_idx = data.get_windowed_test_data()
         # feed in model and get prediction
-        y_predict = model.build_train_predict(x_train, y_train, x_predict)
-        plot_result(y_predict, y_true, time_idx)
+        y_pred = model.build_train_predict(x_train, y_train, x_pred)
+        model.evaluate(y_true, y_pred)
+        plot_result(y_pred, y_true, time_idx)
 
 
 if __name__ == '__main__':

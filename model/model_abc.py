@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABCMeta
+from sklearn.metrics import mean_squared_error
 
 from model.util import Timer
 
@@ -36,3 +37,7 @@ class Model(object):
         wrap_func("Train Stage", self.train, x=x_train, y=y_train)
         predict_data = wrap_func("Predict Stage", self.predict, x=x_predict)
         return predict_data
+
+    @staticmethod
+    def evaluate(y_true, y_pred):
+        print('[Model] Evaluate with MSE: %s' % mean_squared_error(y_true, y_pred))

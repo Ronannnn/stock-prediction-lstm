@@ -3,10 +3,10 @@ from sklearn import linear_model
 from model.data_processor import DataLoader
 from model.model_abc import Model
 from model.util import load_config, plot_result
-import numpy as np
 
 
 class LinearModel(Model):
+
     def build(self):
         self.model = linear_model.LinearRegression()
 
@@ -30,9 +30,10 @@ def linear_model_test():
     # feed in model and get prediction
     x_train = [[i] for i in range(len(close_data_train))]
     y_train = close_data_train
-    x_predict = [[i] for i in range(len(close_data_train), len(close_data_train) + len(close_data_test), 1)]
-    y_predict = model.build_train_predict(x_train, y_train, x_predict)
-    plot_result(y_predict, close_data_test, time_idx)
+    x_pred = [[i] for i in range(len(close_data_train), len(close_data_train) + len(close_data_test), 1)]
+    y_pred = model.build_train_predict(x_train, y_train, x_pred)
+    model.evaluate(close_data_test, y_pred)
+    plot_result(y_pred, close_data_test, time_idx)
 
 
 if __name__ == '__main__':
