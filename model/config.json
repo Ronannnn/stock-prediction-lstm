@@ -82,6 +82,26 @@
           "activation": "linear"
         }
       ]
+    },
+    {
+      "name": "dense",
+      "include": false,
+      "loss": "mse",
+      "optimizer": "adam",
+      "layers": [
+        {
+          "type": "dense",
+          "neuron_num": 13,
+          "input_dim": 4,
+          "kernel_initializer": "normal",
+          "activation": "relu"
+        },
+        {
+          "type": "dense",
+          "neuron_num": 1,
+          "kernel_initializer": "normal"
+        }
+      ]
     }
   ]
 }
