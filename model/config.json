@@ -20,19 +20,20 @@
     "days_for_predict": 50,
     "days_to_predict": 1,
     "normalizable": true,
-    "epochs": 50,
-    "batch_size": 50,
-    "save_dir": "saved_models"
+    "save_dir": "saved_models",
+    "verbose": 2
   },
   "models": [
     {
       "name": "from_github",
       "include": false,
+      "epochs": 50,
+      "batch_size": 50,
       "loss": "mse",
       "optimizer": "adam",
       "layers": [
         {
-          "type": "lstm",
+          "type": "lstm_model1",
           "neuron_num": 180,
           "input_timesteps": 89,
           "input_dim": 3,
@@ -64,8 +65,10 @@
       ]
     },
     {
-      "name": "lstms",
+      "name": "lstm_model2",
       "include": true,
+      "epochs": 50,
+      "batch_size": 50,
       "loss": "mse",
       "optimizer": "adam",
       "layers": [
@@ -84,8 +87,10 @@
       ]
     },
     {
-      "name": "dense",
+      "name": "dense_model",
       "include": false,
+      "epochs": 50,
+      "batch_size": 50,
       "loss": "mse",
       "optimizer": "adam",
       "layers": [

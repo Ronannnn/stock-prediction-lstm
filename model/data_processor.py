@@ -1,30 +1,21 @@
 import numpy as np
-import pandas as pd
 import yfinance as yf
 from sklearn.preprocessing import MinMaxScaler
 
 
 class DataLoader:
-    def __init__(self,
-                 stock_code=None,
-                 start=None,
-                 end=None,
-                 cols=None,
-                 train_test_split_ratio=0.75,
-                 days_for_predict=50,
-                 days_to_predict=1,
-                 normalizable=True):
-        df = yf.download(stock_code, start=start, end=end)
+    def __init__(self, config):
+        df = yf.download(config["stock_code"], start=config["start"], end=config["end"])
         if len(df) == 0:
-            raise Exception("No data for stock code" + stock_code)
-        split_num = int(len(df) * train_test_split_ratio)
-        self.train_data = df.get(cols)[:split_num]
-        self.test_data = df.get(cols)[split_num:]
+            raise Exception("No data for stock code" + config["stock_code"])
+        split_num = int(len(df) * config["train_test_split"])
+        self.train_data = df.get(config["columns"])[:split_num]
+        self.test_data = df.get(config["columns"])[split_num:]
         self.train_len = len(self.train_data)
         self.test_len = len(self.test_data)
-        self.days_for_predict = days_for_predict
-        self.days_to_predict = days_to_predict
-        self.normalizable = normalizable
+        self.days_for_predict = config["days_for_predict"]
+        self.days_to_predict = config["days_to_predict"]
+        self.normalizable = config["normalizable"]
 
     def get_train_data(self):
         return self.get_data(self.train_data)
@@ -101,20 +92,3 @@ class DataLoader:
         scaler = MinMaxScaler()
         scaler.fit(data)
         return scaler.transform(data)
-
-    # db interaction
-    def fix_range(self, stock_code, start, end):
-        """
-        Check if those data of this stock is already in db
-        if not, fetch from yfinance api
-        """
-        return False
-
-    def fetch_from_db(self, stock_codes, start, end):
-        return pd.DataFrame
-
-    def fetch_us_dollar_idx(self):
-        return 1
-
-    def fetch_interest_rate(self, country):
-        return 1
