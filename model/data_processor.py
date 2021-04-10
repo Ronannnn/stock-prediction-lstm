@@ -17,18 +17,15 @@ class DataLoader:
         self.days_to_predict = config["days_to_predict"]
         self.normalizable = config["normalizable"]
 
-    def get_train_data(self):
-        return self.get_data(self.train_data)
+    def get_linear_train_data(self):
+        return self.get_linear_data(self.train_data)
 
-    def get_test_data(self):
-        return self.get_data(self.test_data)
+    def get_linear_test_data(self):
+        return self.get_linear_data(self.test_data)
 
-    def get_data(self, data):
+    def get_linear_data(self, data):
         normalized_data = self.normalize_data(data) if self.normalizable else data
-        x = normalized_data[:]
-        y = normalized_data[:, [1]]  # close
-        time_idx = data.index.values
-        return x, y, time_idx
+        return normalized_data[:, [1]], [[i] for i in data.index.values]
 
     def get_windowed_train_data(self):
         return self.get_windowed_data(self.train_data)
