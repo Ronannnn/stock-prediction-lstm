@@ -7,17 +7,16 @@ from sklearn.preprocessing import MinMaxScaler
 class DataLoader:
 
     def __init__(self,
-                 stock_code,
-                 train_test_split_ratio,
-                 cols,
-                 seq_len,
-                 predicted_days,
-                 batch_size,
-                 normalise,
-                 start,
-                 end):
+                 stock_code=None,
+                 train_test_split_ratio=0.75,
+                 cols=None,
+                 seq_len=50,
+                 predicted_days=1,
+                 batch_size=50,
+                 normalise=True,
+                 start=None,
+                 end=None):
         # todo check if already in db
-        # todo set proper start and end
         df = yf.download(stock_code, start=start, end=end)
         if len(df) == 0:
             raise Exception("No data for stock code" + stock_code)
@@ -29,7 +28,20 @@ class DataLoader:
         self.seq_len = seq_len
         self.predicted_days = predicted_days
         self.batch_size = batch_size
-        self.normalize = normalise
+        self.normalizable = normalise
+
+    def get_train_data(self):
+        return self.get_data(self.train_data)
+
+    def get_test_data(self):
+        return self.get_data(self.test_data)
+
+    def get_data(self, data):
+        normalized_data = self.normalize_data(data) if self.normalizable else data
+        x = normalized_data[:]
+        y = normalized_data[:, [1]]  # close
+        time_idx = data.index.values
+        return x, y, time_idx
 
     def get_windowed_train_data(self):
         return self.get_windowed_data(self.train_data)
@@ -37,7 +49,7 @@ class DataLoader:
     def get_windowed_test_data(self):
         return self.get_windowed_data(self.test_data)
 
-    def get_predict_data(self):
+    def get_windowed_predict_data(self):
         windowed_data = []
         time_idx = []
         for i in range(self.test_len - self.seq_len, -1, -self.predicted_days):
@@ -45,7 +57,7 @@ class DataLoader:
             windowed_data.append(sub_data)
             time_idx.append(list(sub_data.index.values[-self.predicted_days:]))
         # normalization
-        windowed_data = self.normalize_windows(windowed_data) if self.normalize else np.array(windowed_data)
+        windowed_data = self.normalize_windowed_data(windowed_data) if self.normalizable else np.array(windowed_data)
         # https://www.pythoninformer.com/python-libraries/numpy/index-and-slice/
         x = windowed_data[:, :-self.predicted_days]
         y = windowed_data[:, -self.predicted_days:, [1]]
@@ -59,10 +71,10 @@ class DataLoader:
             windowed_data.append(sub_data)
             time_idx.append(list(sub_data.index.values[-self.predicted_days:]))
         # normalization
-        windowed_data = self.normalize_windows(windowed_data) if self.normalize else np.array(windowed_data)
+        windowed_data = self.normalize_windowed_data(windowed_data) if self.normalizable else np.array(windowed_data)
         # https://www.pythoninformer.com/python-libraries/numpy/index-and-slice/
         x = windowed_data[:, :-self.predicted_days]
-        y = windowed_data[:, -self.predicted_days, [0]]
+        y = windowed_data[:, -self.predicted_days, [1]]
         return x, y, time_idx
 
     # todo runtime error
@@ -77,20 +89,26 @@ class DataLoader:
                     yield np.array(x_batch), np.array(y_batch)
                     i = 0
                 window = self.train_data[i:i + self.seq_len]
-                window = self.normalize_windows(window) if self.normalize else np.array(window)
+                window = self.normalize_windowed_data(window) if self.normalizable else np.array(window)
                 x_batch.append(window[:-1])
                 y_batch.append(window[-1, [0]])
                 i += 1
             yield np.array(x_batch), np.array(y_batch)
 
     @staticmethod
-    def normalize_windows(windowed_data):
+    def normalize_windowed_data(data):
         res = []
         scaler = MinMaxScaler()
-        for window in windowed_data:
+        for window in data:
             scaler.fit(window)
             res.append(scaler.transform(window))
         return np.array(res)
+
+    @staticmethod
+    def normalize_data(data):
+        scaler = MinMaxScaler()
+        scaler.fit(data)
+        return scaler.transform(data)
 
     # db interaction
     def fix_range(self, stock_code, start, end):
