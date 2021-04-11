@@ -2,7 +2,7 @@ import datetime as dt
 import os
 
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-from keras.layers import Dense, LSTM, Dropout
+from keras.layers import Dense, LSTM, Dropout, RepeatVector, TimeDistributed
 from keras.models import Sequential, load_model
 
 from model.data_processor import DataLoader
@@ -22,11 +22,15 @@ def new_dense(layer_config):
 
 def new_lstm(layer_config):
     neuron_num = layer_config['neuron_num'] if 'neuron_num' in layer_config else None
+    activation = layer_config['activation'] if 'activation' in layer_config else 'tanh'
+    return_seq = layer_config['return_seq'] if 'return_seq' in layer_config else False
     input_timesteps = layer_config['input_timesteps'] if 'input_timesteps' in layer_config else None
     input_dim = layer_config['input_dim'] if 'input_dim' in layer_config else None
-    return_seq = layer_config['return_seq'] if 'return_seq' in layer_config else None
     input_shape = (input_timesteps, input_dim) if input_timesteps is not None and input_dim is not None else None
-    return LSTM(neuron_num, input_shape=input_shape, return_sequences=return_seq)
+    if input_timesteps is None or input_dim is None:
+        return LSTM(neuron_num, activation=activation, return_sequences=return_seq)
+    else:
+        return LSTM(neuron_num, activation=activation, input_shape=input_shape, return_sequences=return_seq)
 
 
 def new_dropout(layer_config):
@@ -34,10 +38,22 @@ def new_dropout(layer_config):
     return Dropout(dropout_rate)
 
 
+def new_repeat_vector(layer_config):
+    neuron_num = layer_config['neuron_num'] if 'neuron_num' in layer_config else None
+    return RepeatVector(neuron_num)
+
+
+def new_time_distributed_dense(layer_config):
+    neuron_num = layer_config['neuron_num'] if 'neuron_num' in layer_config else None
+    return TimeDistributed(Dense(neuron_num))
+
+
 layer_dict = {
     "dense": new_dense,
     "lstm": new_lstm,
-    "dropout": new_dropout
+    "dropout": new_dropout,
+    "repeat": new_repeat_vector,
+    "time_dense": new_time_distributed_dense
 }
 
 
@@ -104,8 +120,8 @@ def nn_model_test():
         x_pred, y_true, time_idx = data.get_windowed_test_data()
         # feed in model and get prediction
         y_pred = model.build_train_predict(x_train, y_train, x_pred)
-        model.evaluate(y_true, y_pred)
-        plot_result(y_pred, y_true, time_idx)
+        model.evaluate(y_true.ravel(), y_pred.ravel())
+        plot_result(y_pred.ravel(), y_true.ravel(), time_idx)
 
 
 if __name__ == '__main__':

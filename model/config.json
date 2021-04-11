@@ -33,7 +33,7 @@
       "optimizer": "adam",
       "layers": [
         {
-          "type": "lstm_model1",
+          "type": "lstm",
           "neuron_num": 180,
           "input_timesteps": 89,
           "input_dim": 3,
@@ -65,8 +65,8 @@
       ]
     },
     {
-      "name": "lstm_model2",
-      "include": true,
+      "name": "lstm_model",
+      "include": false,
       "epochs": 50,
       "batch_size": 50,
       "loss": "mse",
@@ -105,6 +105,37 @@
           "type": "dense",
           "neuron_num": 1,
           "kernel_initializer": "normal"
+        }
+      ]
+    },
+    {
+      "name": "seq2seq_model",
+      "include": true,
+      "epochs": 50,
+      "batch_size": 50,
+      "loss": "mse",
+      "optimizer": "adam",
+      "layers": [
+        {
+          "type": "lstm",
+          "neuron_num": 128,
+          "input_timesteps": 49,
+          "input_dim": 4,
+          "activation": "relu"
+        },
+        {
+          "type": "repeat",
+          "neuron_num": 1
+        },
+        {
+          "type": "lstm",
+          "neuron_num": 128,
+          "activation": "relu",
+          "return_seq": true
+        },
+        {
+          "type": "time_dense",
+          "neuron_num": 1
         }
       ]
     }

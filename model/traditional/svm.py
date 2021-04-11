@@ -24,30 +24,31 @@ class SVMModel(Model):
         return self.model.predict(X)
 
 
+svm_configs = [
+    {
+        "kernel": "rbf",
+        "degree": 3,
+        "C": 1e3,
+        "gamma": 0.1
+    },
+    # {
+    #     "kernel": "linear",
+    #     "degree": 3,
+    #     "C": 1e3,
+    #     "gamma": 'auto'
+    # },
+    # {
+    #     "kernel": "poly",
+    #     "degree": 2,
+    #     "C": 1e3,
+    #     "gamma": 'auto'
+    # },
+]
+
+
 def svm_model_test():
     config = load_config()
-    svm_configs = [
-        {
-            "kernel": "rbf",
-            "degree": 3,
-            "C": 1e3,
-            "gamma": 0.1
-        },
-        # {
-        #     "kernel": "linear",
-        #     "degree": 3,
-        #     "C": 1e3,
-        #     "gamma": 'auto'
-        # },
-        # {
-        #     "kernel": "poly",
-        #     "degree": 2,
-        #     "C": 1e3,
-        #     "gamma": 'auto'
-        # },
-    ]
     data = DataLoader(config["data"])
-
     for svm_config in svm_configs:
         # get data
         model = SVMModel(

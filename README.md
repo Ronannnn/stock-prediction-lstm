@@ -24,3 +24,7 @@ Google GOOGL
 
 ### slice
 [Reference](https://www.pythoninformer.com/python-libraries/numpy/index-and-slice/)
+
+## Model Reference
+[Linear SVM first Reference](https://github.com/chaitjo/regression-stock-prediction/blob/master/svr.py)
+[Encoder Decoder LSTM](https://deepdatainsight.com/stock-market-prediction-approaches/)
