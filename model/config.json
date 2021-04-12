@@ -67,7 +67,7 @@
     {
       "name": "lstm_model",
       "include": false,
-      "epochs": 50,
+      "epochs": 20,
       "batch_size": 50,
       "loss": "mse",
       "optimizer": "adam",
@@ -111,7 +111,7 @@
     {
       "name": "seq2seq_model",
       "include": true,
-      "epochs": 50,
+      "epochs": 20,
       "batch_size": 50,
       "loss": "mse",
       "optimizer": "adam",

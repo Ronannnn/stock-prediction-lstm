@@ -26,10 +26,21 @@ def load_config():
     return config
 
 
-def plot_result(predicted_data, true_data, time_idx):
-    fig = plt.figure(facecolor='white')
-    ax = fig.add_subplot(111)
-    ax.plot(time_idx, true_data, label='True Data')
-    plt.plot(time_idx, predicted_data, label='Prediction')
+def plot(time_idx, data):
+    """
+    data format:
+    {
+        data description: data
+    }
+    """
+    for key in data:
+        plt.plot(time_idx, data[key], label=key)
     plt.legend()
     plt.show()
+
+
+def plot_pred_true_result(time_idx, y_pred, y_true):
+    plot(time_idx, {
+        "pred data": y_pred,
+        "true data": y_true
+    })

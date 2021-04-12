@@ -17,14 +17,15 @@ def get_plot_data(stock_code):
 
     # model builder
     timer.reset()
-    model = NNModel(config["models"][1])
+    model_config = config["models"][1]
+    model = NNModel(model_config)
     model.build()
     steps.append(timer.stop())
 
     # train
     timer.reset()
     x, y, _ = data.get_windowed_train_data()
-    model.train(x, y)
+    model.train(x, y, model_config["epochs"], model_config["batch_size"])
     steps.append(timer.stop())
 
     # predict

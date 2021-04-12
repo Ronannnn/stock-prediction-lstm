@@ -9,7 +9,9 @@ from model.data_processor import DataLoader
 from model.model_abc import Model
 
 # nn layer newer
-from model.util import load_config, plot_result
+from model.util import load_config, plot, plot_pred_true_result
+
+import numpy as np
 
 
 def new_dense(layer_config):
@@ -74,13 +76,11 @@ class NNModel(Model):
             self.model.add(layer_dict[layer_config['type']](layer_config))
         self.model.compile(loss=self.config['loss'], optimizer=self.config['optimizer'])
 
-    def train(self, X, y):
+    def train(self, X, y, epochs, batch_size):
         callbacks = [
-            EarlyStopping(monitor='loss', patience=2),  # Stop after 2 epochs whose loss is no longer decreasing
-            ModelCheckpoint(self.filename, monitor='loss', save_best_only=True)  # monitor is 'loss' not 'val_loss'
+            # EarlyStopping(monitor='loss', patience=2),  # Stop after 2 epochs whose loss is no longer decreasing
+            # ModelCheckpoint(self.filename, monitor='loss', save_best_only=True)  # monitor is 'loss' not 'val_loss'
         ]
-        epochs = self.config["epochs"]
-        batch_size = self.config["batch_size"]
         print('[Model] Training Started')
         print('[Model] %s epochs, %s batch size' % (epochs, batch_size))
         self.model.fit(X, y, epochs=epochs, batch_size=batch_size, callbacks=callbacks, verbose=self.verbose)
@@ -119,9 +119,11 @@ def nn_model_test():
         x_train, y_train, _ = data.get_windowed_train_data()
         x_pred, y_true, time_idx = data.get_windowed_test_data()
         # feed in model and get prediction
-        y_pred = model.build_train_predict(x_train, y_train, x_pred)
+        y_pred = model.build_train_predict(x_train, y_train, x_pred, model_config["epochs"], model_config["batch_size"])
         model.evaluate(y_true.ravel(), y_pred.ravel())
-        plot_result(y_pred.ravel(), y_true.ravel(), time_idx)
+        plot_pred_true_result(time_idx, y_pred.ravel(), y_true.ravel())
+        # model.find_best_epoch(1, 40, 1, x_train, y_train, x_pred, y_true)
+        # model.find_best_batch_size(0, 300, 10, x_train, y_train, x_pred, y_true)
 
 
 if __name__ == '__main__':
