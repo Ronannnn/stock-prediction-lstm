@@ -89,7 +89,7 @@
     {
       "name": "dense_model",
       "include": false,
-      "epochs": 50,
+      "epochs": 20,
       "batch_size": 50,
       "loss": "mse",
       "optimizer": "adam",
@@ -110,7 +110,7 @@
     },
     {
       "name": "seq2seq_model",
-      "include": true,
+      "include": false,
       "epochs": 20,
       "batch_size": 50,
       "loss": "mse",
@@ -136,6 +136,32 @@
         {
           "type": "time_dense",
           "neuron_num": 1
+        }
+      ]
+    },
+    {
+      "name": "bilstm",
+      "include": true,
+      "epochs": 20,
+      "batch_size": 50,
+      "loss": "mse",
+      "optimizer": "adam",
+      "layers": [
+        {
+          "type": "bilstm",
+          "neuron_num": 100,
+          "return_seq": true,
+          "input_timesteps": 49,
+          "input_dim": 4
+        },
+        {
+          "type": "bilstm",
+          "neuron_num": 100
+        },
+        {
+          "type": "dense",
+          "neuron_num": 1,
+          "activation": "linear"
         }
       ]
     }

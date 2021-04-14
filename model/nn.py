@@ -2,16 +2,14 @@ import datetime as dt
 import os
 
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-from keras.layers import Dense, LSTM, Dropout, RepeatVector, TimeDistributed
+from keras.layers import Dense, LSTM, Dropout, RepeatVector, TimeDistributed, Bidirectional
 from keras.models import Sequential, load_model
 
 from model.data_processor import DataLoader
 from model.model_abc import Model
 
 # nn layer newer
-from model.util import load_config, plot, plot_pred_true_result
-
-import numpy as np
+from model.util import load_config, plot_pred_true_result
 
 
 def new_dense(layer_config):
@@ -23,16 +21,36 @@ def new_dense(layer_config):
 
 
 def new_lstm(layer_config):
+    neuron_num, activation, return_seq, input_timesteps, input_dim = lstm_config(layer_config)
+    if input_timesteps is None or input_dim is None:
+        return LSTM(neuron_num, activation=activation, return_sequences=return_seq)
+    else:
+        return LSTM(
+            neuron_num,
+            activation=activation,
+            input_shape=(input_timesteps, input_dim),
+            return_sequences=return_seq
+        )
+
+
+def new_bi_lstm(layer_config):
+    neuron_num, activation, return_seq, input_timesteps, input_dim = lstm_config(layer_config)
+    if input_timesteps is None or input_dim is None:
+        return Bidirectional(LSTM(neuron_num, activation=activation, return_sequences=return_seq))
+    else:
+        return Bidirectional(
+            LSTM(neuron_num, activation=activation, return_sequences=return_seq),
+            input_shape=(input_timesteps, input_dim)
+        )
+
+
+def lstm_config(layer_config):
     neuron_num = layer_config['neuron_num'] if 'neuron_num' in layer_config else None
     activation = layer_config['activation'] if 'activation' in layer_config else 'tanh'
     return_seq = layer_config['return_seq'] if 'return_seq' in layer_config else False
     input_timesteps = layer_config['input_timesteps'] if 'input_timesteps' in layer_config else None
     input_dim = layer_config['input_dim'] if 'input_dim' in layer_config else None
-    input_shape = (input_timesteps, input_dim) if input_timesteps is not None and input_dim is not None else None
-    if input_timesteps is None or input_dim is None:
-        return LSTM(neuron_num, activation=activation, return_sequences=return_seq)
-    else:
-        return LSTM(neuron_num, activation=activation, input_shape=input_shape, return_sequences=return_seq)
+    return neuron_num, activation, return_seq, input_timesteps, input_dim
 
 
 def new_dropout(layer_config):
@@ -53,6 +71,7 @@ def new_time_distributed_dense(layer_config):
 layer_dict = {
     "dense": new_dense,
     "lstm": new_lstm,
+    "bilstm": new_bi_lstm,
     "dropout": new_dropout,
     "repeat": new_repeat_vector,
     "time_dense": new_time_distributed_dense
