@@ -5,10 +5,12 @@ from model.util import Timer, load_config
 steps = []
 
 
-def get_plot_data(stock_code):
+def get_plot_data(params):
     timer = Timer()
     config = load_config()
-    config['data']['stock_code'] = stock_code
+    config['data']['stock_code'] = params['stockCode']
+    config['data']['start'] = params['date'][0][0:10]
+    config['data']['end'] = params['date'][1][0:10]
 
     # data loader
     timer.reset()

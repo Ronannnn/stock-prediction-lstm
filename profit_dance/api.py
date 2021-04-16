@@ -14,7 +14,7 @@ def train(request):
     # reset steps
     steps[:] = []
     params = request.data
-    return Response({'rawData': get_plot_data(params['stockCode'])})
+    return Response({'rawData': get_plot_data(params)})
 
 
 # noinspection PyUnusedLocal
