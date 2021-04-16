@@ -110,24 +110,6 @@ class NNModel(Model):
         self.model.fit(X, y, epochs=epochs, batch_size=batch_size, callbacks=callbacks, verbose=self.verbose)
         print('[Model] Training Completed. Model saved as %s' % self.filename)
 
-    def train_with_generator(self, data_generator):
-        epochs = self.config["epochs"]
-        steps_per_epoch = self.config["steps_per_epoch"]
-        print('[Model] Training Started')
-        print('[Model] %s epochs, %s batches per epoch' % (epochs, steps_per_epoch))
-        callbacks = [
-            ModelCheckpoint(self.filename, monitor='loss', save_best_only=True)
-        ]
-        self.model.fit_generator(
-            data_generator,
-            steps_per_epoch=steps_per_epoch,
-            epochs=epochs,
-            callbacks=callbacks,
-            workers=1,
-            verbose=self.verbose
-        )
-        print('[Model] Training Completed. Model saved as %s' % self.filename)
-
     def predict(self, X):
         return self.model.predict(X, batch_size=self.config["batch_size"])
 
@@ -139,10 +121,8 @@ def nn_model_test():
         if model_config['include'] is False:
             continue
         model = NNModel(model_config, config['data']['save_dir'], config['data']['verbose'])
-        # get data
         x_train, y_train, _ = data.get_windowed_train_data()
         x_pred, y_true, time_idx = data.get_windowed_test_data()
-        # feed in model and get prediction
         y_pred = model.build_train_predict(x_train, y_train, x_pred, model_config["epochs"], model_config["batch_size"])
         model.evaluate(y_true.ravel(), y_pred.ravel())
         plot_pred_true_result(time_idx, y_pred.ravel(), y_true.ravel())

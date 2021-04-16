@@ -4,14 +4,14 @@ from sklearn.metrics import mean_squared_error
 from model.util import Timer, plot
 import numpy as np
 
-timer = Timer()
+wrap_func_timer = Timer()
 
 
 def wrap_func(func_name, func, **args):
-    timer.reset()
+    wrap_func_timer.reset()
     print("[Model] %s started." % func_name)
     return_val = func(**args)
-    timer.stop(msg="[Model] %s finished" % func_name)
+    wrap_func_timer.stop(msg="[Model] %s finished" % func_name)
     return return_val
 
 
@@ -24,10 +24,6 @@ class Model(object):
 
     @abstractmethod
     def train(self, X, y, epochs, batch_size):
-        pass
-
-    @abstractmethod
-    def train_with_generator(self, data_generator):
         pass
 
     @abstractmethod

@@ -13,9 +13,6 @@ class LinearModel(Model):
     def train(self, X, y, epochs, batch_size):
         self.model.fit(X, y)
 
-    def train_with_generator(self, data_generator):
-        pass
-
     def predict(self, X):
         return self.model.predict(X)
 

@@ -17,9 +17,6 @@ class SVMModel(Model):
         self.model.fit(X, y)
         pass
 
-    def train_with_generator(self, data_generator):
-        pass
-
     def predict(self, X):
         return self.model.predict(X)
 
