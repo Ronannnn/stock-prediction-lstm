@@ -16,7 +16,7 @@
       "Low",
       "High"
     ],
-    "train_test_split": 0.85,
+    "train_test_split": 0.75,
     "days_for_predict": 50,
     "days_to_predict": 1,
     "normalizable": true,
@@ -27,7 +27,7 @@
     {
       "name": "from_github",
       "include": false,
-      "epochs": 50,
+      "epochs": 20,
       "batch_size": 50,
       "loss": "mse",
       "optimizer": "adam",
@@ -35,8 +35,8 @@
         {
           "type": "lstm",
           "neuron_num": 180,
-          "input_timesteps": 89,
-          "input_dim": 3,
+          "input_timesteps": 49,
+          "input_dim": 4,
           "return_seq": true
         },
         {
@@ -59,7 +59,7 @@
         },
         {
           "type": "dense",
-          "neuron_num": 30,
+          "neuron_num": 1,
           "activation": "linear"
         }
       ]

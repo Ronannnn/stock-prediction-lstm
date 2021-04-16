@@ -30,10 +30,10 @@ def get_plot_data(stock_code):
 
     # predict
     timer.reset()
-    x_test, y_test, time_idx = data.get_windowed_test_data()
-    predictions = model.predict(x_test)
+    x_pred, y_true, time_idx = data.get_windowed_test_data()
+    y_pred = model.predict(x_pred)
     res = []
-    for i in range(len(predictions)):
-        res.append([str(time_idx[i][0])[0: 10], str(y_test[i][0]), str(predictions[i][0])])
+    for i in range(len(y_pred)):
+        res.append([str(time_idx[i])[0: 10], str(y_true[i][0]), str(y_pred[i][0])])
     steps.append(timer.stop())
     return res

@@ -15,7 +15,7 @@ class Timer:
 
     def stop(self, msg=""):
         res = dt.datetime.now() - self.start_dt
-        print(msg + '. Time taken: %s' % res)
+        print(msg + ' Time taken: %s' % res)
         return res
 
 

@@ -94,6 +94,11 @@ class NNModel(Model):
         for layer_config in self.config['layers']:
             self.model.add(layer_dict[layer_config['type']](layer_config))
         self.model.compile(loss=self.config['loss'], optimizer=self.config['optimizer'])
+        # forward_layer = LSTM(10, return_sequences=True)
+        # backward_layer = LSTM(10, activation='relu', return_sequences=True, go_backwards=True)
+        # self.model.add(Bidirectional(forward_layer, backward_layer=backward_layer, input_shape=(49, 4)))
+        # self.model.add(Dense(1, activation='linear'))
+        # self.model.compile(loss='mse', optimizer='adam')
 
     def train(self, X, y, epochs, batch_size):
         callbacks = [
