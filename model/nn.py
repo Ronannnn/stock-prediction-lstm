@@ -129,13 +129,12 @@ def nn_model_test():
         if model_config['include'] is False:
             continue
         model = NNModel(data_config, model_config, data.get_columns_num())
-        x_train, y_train, _ = data.get_windowed_train_data()
-        x_pred, y_true, time_idx = data.get_windowed_test_data()
-        y_pred = model.build_train_predict(x_train, y_train, x_pred, model_config['epochs'], model_config['batch_size'])
-        y_true_ravel = y_true.ravel()
+        x_train, y_train, date_train, x_test, y_test, date_test = data.get_windowed_data()
+        y_pred = model.build_train_predict(x_train, y_train, x_test, model_config['epochs'], model_config['batch_size'])
+        y_true_ravel = y_test.ravel()
         y_pred_ravel = y_pred.ravel()
         model.evaluate(y_true_ravel, y_pred_ravel)
-        plot_pred_true_result(time_idx, y_pred_ravel, y_true_ravel)
+        plot_pred_true_result(date_test, y_pred_ravel, y_true_ravel)
         # model.find_best_epoch(1, 40, 1, x_train, y_train, x_pred, y_true)
         # model.find_best_batch_size(0, 300, 10, x_train, y_train, x_pred, y_true)
 

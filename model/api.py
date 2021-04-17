@@ -27,19 +27,19 @@ def get_plot_data(params):
     model.build()
     steps.append(timer.stop())
 
+    x_train, y_train, date_train, x_test, y_test, date_test = data.get_windowed_data()
+
     # train
     timer.reset()
-    x, y, _ = data.get_windowed_train_data()
-    model.train(x, y, model_config["epochs"], model_config["batch_size"])
+    model.train(x_train, y_train, model_config["epochs"], model_config["batch_size"])
     steps.append(timer.stop())
 
     # predict
     timer.reset()
-    x_pred, y_true, time_idx = data.get_windowed_test_data()
-    y_pred = model.predict(x_pred)
+    y_pred = model.predict(x_test)
     res = []
     for i in range(len(y_pred)):
-        res.append([str(time_idx[i])[0: 10], str(y_true[i][0]), str(y_pred[i][0])])
+        res.append([str(date_test[i])[0: 10], str(y_test[i][0]), str(y_pred[i][0])])
     steps.append(timer.stop())
-    rmse = model.evaluate(y_true, y_pred)
+    rmse = model.evaluate(y_test, y_pred)
     return res, rmse

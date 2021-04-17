@@ -19,17 +19,13 @@ class DataLoader:
         self.normalizable = config["normalizable"]
         self.days_for_predict = config["days_for_predict"]
         self.days_to_predict = config["days_to_predict"]
-        self.train_data, self.test_data = self.fetch_data()
-        self.train_len = len(self.train_data)
-        self.test_len = len(self.test_data)
+        self.data, self.date_idx = self.fetch_data()
 
     def fetch_data(self):
         stock = self.fetch_yf_stock()
         us_dollar_idx = self.fetch_us_dollar_idx()
         merged_data = stock.merge(us_dollar_idx, left_index=True, right_index=True)
-        normalized_data = self.normalize(merged_data, self.normalizable)
-        split_num = int(len(normalized_data) * self.train_test_split)
-        return normalized_data[:split_num], normalized_data[split_num:]
+        return self.normalize(merged_data, self.normalizable), merged_data.index.values
 
     def fetch_yf_stock(self):
         data_filename = "model/data/%s_%s_%s.csv" % (self.stock_code, self.start, self.end)
@@ -59,7 +55,7 @@ class DataLoader:
         return ice_dx
 
     def get_columns_num(self):
-        return self.test_data.shape[1]
+        return self.data.shape[1]
 
     @staticmethod
     def normalize(data, normalizable):
@@ -69,26 +65,25 @@ class DataLoader:
             index=data.index
         ) if normalizable else data
 
-    def get_windowed_train_data(self):
-        return self.get_windowed_data(self.train_data)
-
-    def get_windowed_test_data(self):
-        return self.get_windowed_data(self.test_data)
-
-    def get_windowed_data(self, data):
-        # get col idx of 'Close'
-        close_idx = list(data.columns).index('Close')
-        val = data.values
-        date_idx = data.index.values
-        x = []
-        y = []
-        time_idx = []
-        for l in range(len(data) - self.days_for_predict):
-            r = l + self.days_for_predict
-            x.append(val[l:r])
-            y.append([val[r][close_idx]])
-            time_idx.append(date_idx[r])
-        return np.array(x), np.array(y), time_idx
+    def get_windowed_data(self):
+        windowed_data = []
+        windowed_date_idx = []
+        for idx in range(len(self.data) - self.days_for_predict):
+            windowed_data.append(self.data[idx: idx + self.days_for_predict + 1])  # todo remove days_to_predict
+            windowed_date_idx.append(self.date_idx[idx: idx + self.days_for_predict + 1])
+        windowed_data = np.array(windowed_data)
+        windowed_date_idx = np.array(windowed_date_idx)
+        split_num = int(self.data.shape[0] * self.train_test_split)
+        close_idx = list(self.data.columns).index('Close')
+        # train data
+        x_train = windowed_data[:split_num, :-1]
+        y_train = windowed_data[:split_num, -1, [close_idx]]
+        date_train = windowed_date_idx[:split_num, -1]
+        # test data
+        x_test = windowed_data[split_num:, :-1]
+        y_test = windowed_data[split_num:, -1, [close_idx]]
+        date_test = windowed_date_idx[split_num:, -1]
+        return x_train, y_train, date_train, x_test, y_test, date_test
 
     # for linear regression
     def get_linear_train_data(self):
