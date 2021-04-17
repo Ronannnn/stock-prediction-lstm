@@ -11,6 +11,8 @@ def get_plot_data(params):
     config['data']['stock_code'] = params['stockCode']
     config['data']['start'] = params['date'][0][0:10]
     config['data']['end'] = params['date'][1][0:10]
+    config['data']['days_for_predict'] = params['daysForPredict']
+    config['data']['days_to_predict'] = params['daysToPredict']
 
     # data loader
     timer.reset()
@@ -19,8 +21,9 @@ def get_plot_data(params):
 
     # model builder
     timer.reset()
+    data_config = config["data"]
     model_config = config["models"][1]
-    model = NNModel(model_config)
+    model = NNModel(data_config, model_config, data.get_columns_num())
     model.build()
     steps.append(timer.stop())
 

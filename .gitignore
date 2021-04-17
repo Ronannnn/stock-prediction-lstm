@@ -2,3 +2,4 @@
 *.iml
 saved_models
 venv
+data

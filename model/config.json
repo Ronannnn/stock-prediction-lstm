@@ -8,14 +8,8 @@
   },
   "data": {
     "stock_code": "AAPL",
-    "start": "2015-01-01",
-    "end": "2021-01-01",
-    "columns": [
-      "Open",
-      "Close",
-      "Low",
-      "High"
-    ],
+    "start": "2012-05-18",
+    "end": "2020-07-23",
     "train_test_split": 0.75,
     "days_for_predict": 50,
     "days_to_predict": 1,
@@ -35,8 +29,6 @@
         {
           "type": "lstm",
           "neuron_num": 180,
-          "input_timesteps": 50,
-          "input_dim": 4,
           "return_seq": true
         },
         {
@@ -67,7 +59,7 @@
     {
       "name": "lstm_model",
       "include": true,
-      "epochs": 20,
+      "epochs": 100,
       "batch_size": 50,
       "loss": "mse",
       "optimizer": "adam",
