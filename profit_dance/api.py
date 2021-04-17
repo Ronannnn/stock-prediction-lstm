@@ -14,7 +14,11 @@ def train(request):
     # reset steps
     steps[:] = []
     params = request.data
-    return Response({'rawData': get_plot_data(params)})
+    res, rmse = get_plot_data(params)
+    return Response({
+        'rawData': res,
+        'rmse': rmse,
+    })
 
 
 # noinspection PyUnusedLocal

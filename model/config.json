@@ -35,7 +35,7 @@
         {
           "type": "lstm",
           "neuron_num": 180,
-          "input_timesteps": 49,
+          "input_timesteps": 50,
           "input_dim": 4,
           "return_seq": true
         },
@@ -66,7 +66,7 @@
     },
     {
       "name": "lstm_model",
-      "include": false,
+      "include": true,
       "epochs": 20,
       "batch_size": 50,
       "loss": "mse",
@@ -75,7 +75,7 @@
         {
           "type": "lstm",
           "neuron_num": 100,
-          "input_timesteps": 49,
+          "input_timesteps": 50,
           "input_dim": 4,
           "return_seq": false
         },
@@ -119,7 +119,7 @@
         {
           "type": "lstm",
           "neuron_num": 128,
-          "input_timesteps": 49,
+          "input_timesteps": 50,
           "input_dim": 4,
           "activation": "relu"
         },
@@ -141,7 +141,7 @@
     },
     {
       "name": "bilstm",
-      "include": true,
+      "include": false,
       "epochs": 20,
       "batch_size": 50,
       "loss": "mse",
@@ -151,7 +151,7 @@
           "type": "bilstm",
           "neuron_num": 100,
           "return_seq": true,
-          "input_timesteps": 49,
+          "input_timesteps": 50,
           "input_dim": 4
         },
         {

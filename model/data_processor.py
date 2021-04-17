@@ -26,16 +26,17 @@ class DataLoader:
         return self.get_windowed_data(self.test_data)
 
     def get_windowed_data(self, data):
-        windowed_data = []
+        val = data.values
+        idx = data.index.values
+        x = []
+        y = []
         time_idx = []
-        for i in range(len(data) - self.days_for_predict + 1):
-            sub_data = data[i:i + self.days_for_predict]
-            windowed_data.append(sub_data)
-            time_idx.append(data.index.values[i + self.days_for_predict - 1])
-        windowed_data = np.array(windowed_data)
-        x = windowed_data[:, :-self.days_to_predict]
-        y = windowed_data[:, -self.days_to_predict, [1]]
-        return x, y, time_idx
+        for l in range(len(data) - self.days_for_predict):
+            r = l + self.days_for_predict
+            x.append(val[l:r])
+            y.append([val[r][1]])
+            time_idx.append(idx[r])
+        return np.array(x), np.array(y), time_idx
 
     @staticmethod
     def normalize(data, normalizable):
@@ -47,13 +48,13 @@ class DataLoader:
 
     # for linear regression
     def get_linear_train_data(self):
-        data, time_idx = self.get_linear_data(self.train_data, True)
+        data, time_idx = self.get_linear_data(self.train_data)
         return [[i] for i in range(self.train_len)], data, time_idx
 
     def get_linear_test_data(self):
-        data, time_idx = self.get_linear_data(self.test_data, True)
+        data, time_idx = self.get_linear_data(self.test_data)
         return [[i] for i in range(self.train_len, self.train_len + self.test_len, 1)], data, time_idx
 
-    def get_linear_data(self, data, normalizable):
-        normalized_data = self.normalize(data, normalizable)
-        return normalized_data[:, [1]].ravel(), [[i] for i in data.index.values]
+    @staticmethod
+    def get_linear_data(data):
+        return np.array(data)[:, [1]].ravel(), [[i] for i in data.index.values]

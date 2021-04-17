@@ -8,14 +8,13 @@ from keras.models import Sequential, load_model
 from model.data_processor import DataLoader
 from model.model_abc import Model
 
-# nn layer newer
 from model.util import load_config, plot_pred_true_result
 
 
 def new_dense(layer_config):
     neuron_num = layer_config['neuron_num'] if 'neuron_num' in layer_config else None
     input_dim = layer_config['input_dim'] if 'input_dim' in layer_config else None
-    kernel_initializer = layer_config['kernel_initializer'] if 'input_dim' in layer_config else None
+    kernel_initializer = layer_config['kernel_initializer'] if 'kernel_initializer' in layer_config else None
     activation = layer_config['activation'] if 'activation' in layer_config else None
     return Dense(neuron_num, input_dim=input_dim, kernel_initializer=kernel_initializer, activation=activation)
 
@@ -102,7 +101,7 @@ class NNModel(Model):
 
     def train(self, X, y, epochs, batch_size):
         callbacks = [
-            # EarlyStopping(monitor='loss', patience=2),  # Stop after 2 epochs whose loss is no longer decreasing
+            EarlyStopping(monitor='loss', patience=3),  # Stop after 2 epochs whose loss is no longer decreasing
             # ModelCheckpoint(self.filename, monitor='loss', save_best_only=True)  # monitor is 'loss' not 'val_loss'
         ]
         print('[Model] Training Started')
@@ -111,7 +110,7 @@ class NNModel(Model):
         print('[Model] Training Completed. Model saved as %s' % self.filename)
 
     def predict(self, X):
-        return self.model.predict(X, batch_size=self.config["batch_size"])
+        return self.model.predict(X, batch_size=self.config["batch_size"], verbose=self.verbose)
 
 
 def nn_model_test():
@@ -124,8 +123,10 @@ def nn_model_test():
         x_train, y_train, _ = data.get_windowed_train_data()
         x_pred, y_true, time_idx = data.get_windowed_test_data()
         y_pred = model.build_train_predict(x_train, y_train, x_pred, model_config["epochs"], model_config["batch_size"])
-        model.evaluate(y_true.ravel(), y_pred.ravel())
-        plot_pred_true_result(time_idx, y_pred.ravel(), y_true.ravel())
+        y_true_ravel = y_true.ravel()
+        y_pred_ravel = y_pred.ravel()
+        model.evaluate(y_true_ravel, y_pred_ravel)
+        plot_pred_true_result(time_idx, y_pred_ravel, y_true_ravel)
         # model.find_best_epoch(1, 40, 1, x_train, y_train, x_pred, y_true)
         # model.find_best_batch_size(0, 300, 10, x_train, y_train, x_pred, y_true)
 

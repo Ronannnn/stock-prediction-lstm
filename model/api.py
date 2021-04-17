@@ -38,4 +38,5 @@ def get_plot_data(params):
     for i in range(len(y_pred)):
         res.append([str(time_idx[i])[0: 10], str(y_true[i][0]), str(y_pred[i][0])])
     steps.append(timer.stop())
-    return res
+    rmse = model.evaluate(y_true, y_pred)
+    return res, rmse
