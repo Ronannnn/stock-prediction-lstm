@@ -1,6 +1,7 @@
 import datetime as dt
 import os
 
+import keras
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Dense, LSTM, Dropout, RepeatVector, TimeDistributed, Bidirectional
 from keras.models import Sequential, load_model
@@ -100,12 +101,11 @@ class NNModel(Model):
                 break
         for layer_config in self.model_config['layers']:
             self.model.add(layer_dict[layer_config['type']](layer_config))
-        self.model.compile(loss=self.model_config['loss'], optimizer=self.model_config['optimizer'])
-        # forward_layer = LSTM(10, return_sequences=True)
-        # backward_layer = LSTM(10, activation='relu', return_sequences=True, go_backwards=True)
-        # self.model.add(Bidirectional(forward_layer, backward_layer=backward_layer, input_shape=(49, 4)))
-        # self.model.add(Dense(1, activation='linear'))
-        # self.model.compile(loss='mse', optimizer='adam')
+        self.model.compile(
+            loss=keras.losses.MeanSquaredError(),
+            optimizer=self.model_config['optimizer'],
+            metrics=[keras.metrics.RootMeanSquaredError()]
+        )
 
     def train(self, X, y, epochs, batch_size):
         callbacks = [
@@ -118,7 +118,7 @@ class NNModel(Model):
         print('[Model] Training Completed. Model saved as %s' % self.filename)
 
     def predict(self, X):
-        return self.model.predict(X, batch_size=self.model_config['batch_size'], verbose=self.verbose)
+        return self.model.predict(X, batch_size=self.model_config['batch_size'])
 
 
 def nn_model_test():

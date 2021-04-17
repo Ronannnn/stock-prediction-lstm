@@ -23,7 +23,6 @@
       "include": false,
       "epochs": 20,
       "batch_size": 50,
-      "loss": "mse",
       "optimizer": "adam",
       "layers": [
         {
@@ -61,14 +60,11 @@
       "include": true,
       "epochs": 100,
       "batch_size": 50,
-      "loss": "mse",
       "optimizer": "adam",
       "layers": [
         {
           "type": "lstm",
           "neuron_num": 100,
-          "input_timesteps": 50,
-          "input_dim": 4,
           "return_seq": false
         },
         {
@@ -83,13 +79,11 @@
       "include": false,
       "epochs": 20,
       "batch_size": 50,
-      "loss": "mse",
       "optimizer": "adam",
       "layers": [
         {
           "type": "dense",
           "neuron_num": 13,
-          "input_dim": 4,
           "kernel_initializer": "normal",
           "activation": "relu"
         },
@@ -105,14 +99,11 @@
       "include": false,
       "epochs": 20,
       "batch_size": 50,
-      "loss": "mse",
       "optimizer": "adam",
       "layers": [
         {
           "type": "lstm",
           "neuron_num": 128,
-          "input_timesteps": 50,
-          "input_dim": 4,
           "activation": "relu"
         },
         {
@@ -136,15 +127,12 @@
       "include": false,
       "epochs": 20,
       "batch_size": 50,
-      "loss": "mse",
       "optimizer": "adam",
       "layers": [
         {
           "type": "bilstm",
           "neuron_num": 100,
-          "return_seq": true,
-          "input_timesteps": 50,
-          "input_dim": 4
+          "return_seq": true
         },
         {
           "type": "bilstm",
