@@ -5,6 +5,8 @@ import keras
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Dense, LSTM, Dropout, RepeatVector, TimeDistributed, Bidirectional
 from keras.models import Sequential, load_model
+from keras.optimizers import Adam
+from keras.metrics import MeanAbsolutePercentageError, RootMeanSquaredError
 
 from model.data_processor import DataLoader
 from model.model_abc import Model
@@ -21,26 +23,26 @@ def new_dense(layer_config):
 
 
 def new_lstm(layer_config):
-    neuron_num, activation, return_seq, input_timesteps, input_dim = lstm_config(layer_config)
-    if input_timesteps is None or input_dim is None:
+    neuron_num, activation, return_seq, days_for_predict, feature_num = lstm_config(layer_config)
+    if days_for_predict is None or feature_num is None:
         return LSTM(neuron_num, activation=activation, return_sequences=return_seq)
     else:
         return LSTM(
             neuron_num,
             activation=activation,
-            input_shape=(input_timesteps, input_dim),
-            return_sequences=return_seq
+            input_shape=(days_for_predict, feature_num),
+            return_sequences=return_seq,
         )
 
 
 def new_bi_lstm(layer_config):
-    neuron_num, activation, return_seq, input_timesteps, input_dim = lstm_config(layer_config)
-    if input_timesteps is None or input_dim is None:
+    neuron_num, activation, return_seq, days_for_predict, feature_num = lstm_config(layer_config)
+    if days_for_predict is None or feature_num is None:
         return Bidirectional(LSTM(neuron_num, activation=activation, return_sequences=return_seq))
     else:
         return Bidirectional(
             LSTM(neuron_num, activation=activation, return_sequences=return_seq),
-            input_shape=(input_timesteps, input_dim)
+            input_shape=(days_for_predict, feature_num)
         )
 
 
@@ -48,9 +50,9 @@ def lstm_config(layer_config):
     neuron_num = layer_config['neuron_num'] if 'neuron_num' in layer_config else None
     activation = layer_config['activation'] if 'activation' in layer_config else 'tanh'
     return_seq = layer_config['return_seq'] if 'return_seq' in layer_config else False
-    input_timesteps = layer_config['days_for_predict'] if 'days_for_predict' in layer_config else None
-    input_dim = layer_config['feature_num'] if 'feature_num' in layer_config else None
-    return neuron_num, activation, return_seq, input_timesteps, input_dim
+    days_for_predict = layer_config['days_for_predict'] if 'days_for_predict' in layer_config else None
+    feature_num = layer_config['feature_num'] if 'feature_num' in layer_config else None
+    return neuron_num, activation, return_seq, days_for_predict, feature_num
 
 
 def new_dropout(layer_config):
@@ -86,7 +88,8 @@ class NNModel(Model):
         self.days_to_predict = data_config['days_to_predict']
         self.feature_num = feature_num
         self.filename = os.path.join(
-            data_config['save_dir'], '%s-%s.h5' % (self.model_config['name'], dt.datetime.now().strftime('%Y%m%d%H%M%S')))
+            data_config['save_dir'],
+            '%s-%s.h5' % (self.model_config['name'], dt.datetime.now().strftime('%Y%m%d%H%M%S')))
         self.verbose = data_config['verbose']
 
     def load(self, file):
@@ -103,18 +106,20 @@ class NNModel(Model):
             self.model.add(layer_dict[layer_config['type']](layer_config))
         self.model.compile(
             loss=keras.losses.MeanSquaredError(),
-            optimizer=self.model_config['optimizer'],
-            metrics=[keras.metrics.RootMeanSquaredError()]
+            optimizer=Adam(learning_rate=0.01),
+            metrics=[MeanAbsolutePercentageError(), RootMeanSquaredError()]
         )
 
     def train(self, X, y, epochs, batch_size):
         callbacks = [
-            EarlyStopping(monitor='loss', patience=3),  # Stop after 2 epochs whose loss is no longer decreasing
+            # EarlyStopping(monitor='loss', patience=3),  # Stop after 2 epochs whose loss is no longer decreasing
             # ModelCheckpoint(self.filename, monitor='loss', save_best_only=True)  # monitor is 'loss' not 'val_loss'
         ]
         print('[Model] Training Started')
         print('[Model] %s epochs, %s batch size' % (epochs, batch_size))
-        self.model.fit(X, y, epochs=epochs, batch_size=batch_size, callbacks=callbacks, verbose=self.verbose)
+        self.model.fit(X, y, epochs=epochs, batch_size=batch_size, callbacks=callbacks, verbose=self.verbose,
+                       shuffle=False)
+        self.model.reset_states()
         print('[Model] Training Completed. Model saved as %s' % self.filename)
 
     def predict(self, X):

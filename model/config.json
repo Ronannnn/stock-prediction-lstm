@@ -21,8 +21,8 @@
     {
       "name": "from_github",
       "include": false,
-      "epochs": 20,
-      "batch_size": 50,
+      "epochs": 30,
+      "batch_size": 64,
       "optimizer": "adam",
       "layers": [
         {
@@ -58,13 +58,13 @@
     {
       "name": "lstm_model",
       "include": true,
-      "epochs": 100,
-      "batch_size": 50,
+      "epochs": 30,
+      "batch_size": 64,
       "optimizer": "adam",
       "layers": [
         {
           "type": "lstm",
-          "neuron_num": 100,
+          "neuron_num": 32,
           "return_seq": false
         },
         {
