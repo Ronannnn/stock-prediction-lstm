@@ -34,9 +34,7 @@ class DataLoader:
             if len(stock_data) == 0:
                 raise Exception("No data for stock code %s" % self.stock_code)
             stock_data.to_csv(data_filename)
-        else:
-            stock_data = pd.read_csv(data_filename, index_col=0)
-        return stock_data
+        return pd.read_csv(data_filename, index_col=0)  # todo why return stock_data from first if is not ok
 
     def fetch_us_dollar_idx(self):
         """

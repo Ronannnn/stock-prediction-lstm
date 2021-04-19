@@ -7,6 +7,17 @@
     "database": "dsci560"
   },
   "data": {
+    "stock_code_list": [
+      "AAPL",
+      "GOOG",
+      "FB",
+      "AMZN",
+      "ORCL",
+      "MSFT",
+      "DELL",
+      "ADBE",
+      "NFLX"
+    ],
     "stock_code": "AAPL",
     "start": "2012-05-18",
     "end": "2020-07-23",
@@ -58,13 +69,13 @@
     {
       "name": "lstm_model",
       "include": true,
-      "epochs": 30,
+      "epochs": 50,
       "batch_size": 64,
       "optimizer": "adam",
       "layers": [
         {
           "type": "lstm",
-          "neuron_num": 32,
+          "neuron_num": 140,
           "return_seq": false
         },
         {

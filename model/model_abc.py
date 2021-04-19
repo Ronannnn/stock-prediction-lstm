@@ -31,19 +31,16 @@ class Model(object):
         pass
 
     def build_train_predict(self, x_train, y_train, x_pred, epochs, batch_size):
-        total_timer = Timer()
-        total_timer.reset()
         wrap_func("Build Stage", self.build)
         wrap_func("Train Stage", self.train, X=x_train, y=y_train, epochs=epochs, batch_size=batch_size)
         y_pred = wrap_func("Predict Stage", self.predict, X=x_pred)
-        total_timer.stop("[Model] total")
         return y_pred
 
     @staticmethod
     def evaluate(y_true, y_pred):
-        res = mean_squared_error(y_true, y_pred)
-        print('[Model] Evaluate with MSE: %s' % res)
-        return res
+        rmse = mean_squared_error(y_true, y_pred, squared=False)
+        print('[Model] Evaluate with RMSE: %s' % rmse)
+        return rmse
 
     def find_best_epoch(self, min_epochs, max_epochs, step, x_train, y_train, x_pred, y_true):
         epoch_loss_time = []

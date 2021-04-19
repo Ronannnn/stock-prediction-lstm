@@ -11,7 +11,7 @@ from keras.metrics import MeanAbsolutePercentageError, RootMeanSquaredError
 from model.data_processor import DataLoader
 from model.model_abc import Model
 
-from model.util import load_config, plot_pred_true_result
+from model.util import load_config, plot_pred_true_result, Timer
 
 
 def new_dense(layer_config):
@@ -129,19 +129,28 @@ class NNModel(Model):
 def nn_model_test():
     config = load_config()
     data_config = config['data']
-    data = DataLoader(data_config)
-    for model_config in config['models']:
-        if model_config['include'] is False:
-            continue
-        model = NNModel(data_config, model_config, data.get_columns_num())
-        x_train, y_train, date_train, x_test, y_test, date_test = data.get_windowed_data()
-        y_pred = model.build_train_predict(x_train, y_train, x_test, model_config['epochs'], model_config['batch_size'])
-        y_true_ravel = y_test.ravel()
-        y_pred_ravel = y_pred.ravel()
-        model.evaluate(y_true_ravel, y_pred_ravel)
-        plot_pred_true_result(date_test, y_pred_ravel, y_true_ravel)
-        # model.find_best_epoch(1, 40, 1, x_train, y_train, x_pred, y_true)
-        # model.find_best_batch_size(0, 300, 10, x_train, y_train, x_pred, y_true)
+    res = {}
+    for stock_code in data_config['stock_code_list']:
+        print("---------------")
+        print("Stock Code: %s" % stock_code)
+        data_config['stock_code'] = stock_code
+        data = DataLoader(data_config)
+        for model_config in config['models']:
+            if model_config['include'] is False:
+                continue
+            model = NNModel(data_config, model_config, data.get_columns_num())
+            x_train, y_train, date_train, x_test, y_test, date_test = data.get_windowed_data()
+            total_timer = Timer()
+            total_timer.reset()
+            y_pred = model.build_train_predict(x_train, y_train, x_test, model_config['epochs'], model_config['batch_size'])
+            y_true_ravel = y_test.ravel()
+            y_pred_ravel = y_pred.ravel()
+            res[stock_code] = "rmse: %s, time: %s" % (str(model.evaluate(y_true_ravel, y_pred_ravel)), total_timer.stop())
+            plot_pred_true_result(date_test, y_pred_ravel, y_true_ravel)
+            # model.find_best_epoch(1, 40, 1, x_train, y_train, x_pred, y_true)
+            # model.find_best_batch_size(0, 300, 10, x_train, y_train, x_pred, y_true)
+    for key in res:
+        print(key, res[key])
 
 
 if __name__ == '__main__':
