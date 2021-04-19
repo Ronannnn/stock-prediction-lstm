@@ -14,10 +14,11 @@ def train(request):
     # reset steps
     steps[:] = []
     params = request.data
-    res, rmse = get_plot_data(params)
+    res, rmse, r2 = get_plot_data(params)
     return Response({
         'rawData': res,
         'rmse': rmse,
+        'r2': r2
     })
 
 

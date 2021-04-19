@@ -37,9 +37,12 @@ def get_plot_data(params):
     # predict
     timer.reset()
     y_pred = model.predict(x_test)
+    min_max_scaler = data.get_min_max_scaler()
+    y_test = min_max_scaler.inverse_transform(y_test)
+    y_pred = min_max_scaler.inverse_transform(y_pred)
     res = []
     for i in range(len(y_pred)):
         res.append([str(date_test[i])[0: 10], str(y_test[i][0]), str(y_pred[i][0])])
     steps.append(timer.stop())
-    rmse = model.evaluate(y_test, y_pred)
-    return res, rmse
+    rmse, r2 = model.evaluate(y_test, y_pred)
+    return res, rmse, r2

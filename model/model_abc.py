@@ -41,9 +41,9 @@ class Model(object):
         rmse = mean_squared_error(y_true, y_pred, squared=False)
         print('[Model] Evaluate with RMSE: %s' % rmse)
         # coefficient of correlation
-        r = 1 - np.sum(np.square(y_true - y_pred)) / np.sum(np.square(y_true - np.mean(y_true)))
-        print('[Model] Evaluate with R: %s' % r)
-        return rmse, r
+        r2 = 1 - np.sum(np.square(y_true - y_pred)) / np.sum(np.square(y_true - np.mean(y_true)))
+        print('[Model] Evaluate with R: %s' % r2)
+        return rmse, r2
 
     def find_best_epoch(self, min_epochs, max_epochs, step, x_train, y_train, x_pred, y_true):
         epoch_loss_time = []
