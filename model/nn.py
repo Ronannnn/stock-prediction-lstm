@@ -104,6 +104,7 @@ class NNModel(Model):
                 break
         for layer_config in self.model_config['layers']:
             self.model.add(layer_dict[layer_config['type']](layer_config))
+        print(self.model.summary())
         self.model.compile(
             loss=keras.losses.MeanSquaredError(),
             optimizer=Adam(learning_rate=0.01),
@@ -119,7 +120,7 @@ class NNModel(Model):
         print('[Model] %s epochs, %s batch size' % (epochs, batch_size))
         self.model.fit(X, y, epochs=epochs, batch_size=batch_size, callbacks=callbacks, verbose=self.verbose,
                        shuffle=False)
-        self.model.reset_states()
+        # https://github.com/keras-team/keras/issues/2768
         print('[Model] Training Completed. Model saved as %s' % self.filename)
 
     def predict(self, X):
@@ -145,7 +146,8 @@ def nn_model_test():
             y_pred = model.build_train_predict(x_train, y_train, x_test, model_config['epochs'], model_config['batch_size'])
             y_true_ravel = y_test.ravel()
             y_pred_ravel = y_pred.ravel()
-            res[stock_code] = "rmse: %s, time: %s" % (str(model.evaluate(y_true_ravel, y_pred_ravel)), total_timer.stop())
+            rmse, r = model.evaluate(y_true_ravel, y_pred_ravel)
+            res[stock_code] = "rmse: %s, r: %s, time: %s" % (str(rmse), str(r), total_timer.stop())
             plot_pred_true_result(date_test, y_pred_ravel, y_true_ravel)
             # model.find_best_epoch(1, 40, 1, x_train, y_train, x_pred, y_true)
             # model.find_best_batch_size(0, 300, 10, x_train, y_train, x_pred, y_true)
