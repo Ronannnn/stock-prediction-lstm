@@ -69,7 +69,7 @@ class DataLoader:
             windowed_date_idx.append(self.date_idx[idx: idx + self.days_for_predict + 1])
         windowed_data = np.array(windowed_data)
         windowed_date_idx = np.array(windowed_date_idx)
-        split_num = int(self.data.shape[0] * self.train_test_split)
+        split_num = int(windowed_data.shape[0] * self.train_test_split)
         close_idx = list(self.data.columns).index('Close')
         # train data
         x_train = windowed_data[:split_num, :-1]
