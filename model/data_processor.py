@@ -48,9 +48,7 @@ class DataLoader:
             if len(ice_dx) == 0:
                 raise Exception("No data for stock code %s" % self.stock_code)
             ice_dx.to_csv(data_filename)
-        else:
-            ice_dx = pd.read_csv(data_filename, index_col=0)
-        return ice_dx
+        return pd.read_csv(data_filename, index_col=0)
 
     def get_columns_num(self):
         return self.data.shape[1]
