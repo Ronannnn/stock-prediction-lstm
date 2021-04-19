@@ -11,8 +11,6 @@ def get_plot_data(params):
     config['data']['stock_code'] = params['stockCode']
     config['data']['start'] = params['date'][0][0:10]
     config['data']['end'] = params['date'][1][0:10]
-    config['data']['days_for_predict'] = params['daysForPredict']
-    config['data']['days_to_predict'] = params['daysToPredict']
 
     # data loader
     timer.reset()
