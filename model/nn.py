@@ -116,7 +116,6 @@ class NNModel(Model):
             # EarlyStopping(monitor='loss', patience=3),  # Stop after 2 epochs whose loss is no longer decreasing
             # ModelCheckpoint(self.filename, monitor='loss', save_best_only=True)  # monitor is 'loss' not 'val_loss'
         ]
-        print('[Model] Training Started')
         print('[Model] %s epochs, %s batch size' % (epochs, batch_size))
         self.model.fit(X, y, epochs=epochs, batch_size=batch_size, callbacks=callbacks, verbose=self.verbose,
                        shuffle=False)
@@ -144,11 +143,12 @@ def nn_model_test():
             total_timer = Timer()
             total_timer.reset()
             y_pred = model.build_train_predict(x_train, y_train, x_test, model_config['epochs'], model_config['batch_size'])
-            y_true_ravel = y_test.ravel()
-            y_pred_ravel = y_pred.ravel()
-            rmse, r = model.evaluate(y_true_ravel, y_pred_ravel)
+            min_max_scaler = data.get_min_max_scaler()
+            y_test = min_max_scaler.inverse_transform(y_test)
+            y_pred = min_max_scaler.inverse_transform(y_pred)
+            rmse, r = model.evaluate(y_test, y_pred)
             res[stock_code] = "rmse: %s, r: %s, time: %s" % (str(rmse), str(r), total_timer.stop())
-            plot_pred_true_result(date_test, y_pred_ravel, y_true_ravel)
+            plot_pred_true_result(date_test, y_pred.ravel(), y_test.ravel())
             # model.find_best_epoch(1, 40, 1, x_train, y_train, x_pred, y_true)
             # model.find_best_batch_size(0, 300, 10, x_train, y_train, x_pred, y_true)
     for key in res:

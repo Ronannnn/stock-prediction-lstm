@@ -19,13 +19,13 @@ class DataLoader:
         self.normalizable = config["normalizable"]
         self.days_for_predict = config["days_for_predict"]
         self.days_to_predict = config["days_to_predict"]
-        self.data, self.date_idx = self.fetch_data()
+        self.raw_data, self.data, self.date_idx = self.fetch_data()
 
     def fetch_data(self):
         stock = self.fetch_yf_stock()
         us_dollar_idx = self.fetch_us_dollar_idx()
         merged_data = stock.merge(us_dollar_idx, left_index=True, right_index=True)
-        return self.normalize(merged_data, self.normalizable), merged_data.index.values
+        return merged_data, self.normalize(merged_data, self.normalizable), merged_data.index.values
 
     def fetch_yf_stock(self):
         data_filename = "model/data/%s_%s_%s.csv" % (self.stock_code, self.start, self.end)
@@ -80,6 +80,13 @@ class DataLoader:
         y_test = windowed_data[split_num:, -1, [close_idx]]
         date_test = windowed_date_idx[split_num:, -1]
         return x_train, y_train, date_train, x_test, y_test, date_test
+
+    def get_min_max_scaler(self):
+        close_idx = list(self.data.columns).index('Close')
+        # min max scaler for inversion of predict data
+        min_max_scaler = MinMaxScaler()
+        min_max_scaler.fit(np.array(self.raw_data)[:, [close_idx]])
+        return min_max_scaler
 
     # for linear regression
     def get_linear_train_data(self):
