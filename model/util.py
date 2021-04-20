@@ -35,6 +35,7 @@ def plot(time_idx, data):
     """
     for key in data:
         plt.plot(time_idx, data[key], label=key)
+    plt.xticks(time_idx[::5], rotation='vertical')
     plt.legend()
     plt.show()
 

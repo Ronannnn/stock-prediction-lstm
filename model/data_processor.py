@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timedelta
 
 import numpy as np
 import quandl
@@ -8,13 +9,16 @@ import pandas as pd
 
 # for us dollar index
 quandl.ApiConfig.api_key = 'ZmqDKDtks_xNKfdQv-b4'
+datetime_fmt = '%Y-%m-%d'
 
 
 class DataLoader:
     def __init__(self, config):
         self.stock_code = config["stock_code"]
         self.start = config["start"]
-        self.end = config["end"]
+        # since we use the last window to predict future day, so we fetch one more day
+        end_date = datetime.strptime(config["end"], datetime_fmt) + timedelta(days=1)
+        self.end = end_date.strftime(datetime_fmt)
         self.train_test_split = config["train_test_split"]
         self.normalizable = config["normalizable"]
         self.days_for_predict = config["days_for_predict"]
@@ -65,7 +69,7 @@ class DataLoader:
         windowed_data = []
         windowed_date_idx = []
         for idx in range(len(self.data) - self.days_for_predict):
-            windowed_data.append(self.data[idx: idx + self.days_for_predict + 1])  # todo remove days_to_predict
+            windowed_data.append(self.data[idx: idx + self.days_for_predict + 1])
             windowed_date_idx.append(self.date_idx[idx: idx + self.days_for_predict + 1])
         windowed_data = np.array(windowed_data)
         windowed_date_idx = np.array(windowed_date_idx)
@@ -76,8 +80,8 @@ class DataLoader:
         y_train = windowed_data[:split_num, -1, [close_idx]]
         date_train = windowed_date_idx[:split_num, -1]
         # test data
-        x_test = windowed_data[split_num:, :-1]
-        y_test = windowed_data[split_num:, -1, [close_idx]]
+        x_test = windowed_data[split_num:, :-1]  # use the last window to predict next future day
+        y_test = windowed_data[split_num:-1, -1, [close_idx]]
         date_test = windowed_date_idx[split_num:, -1]
         return x_train, y_train, date_train, x_test, y_test, date_test
 
@@ -87,16 +91,3 @@ class DataLoader:
         min_max_scaler = MinMaxScaler()
         min_max_scaler.fit(np.array(self.raw_data)[:, [close_idx]])
         return min_max_scaler
-
-    # for linear regression
-    def get_linear_train_data(self):
-        data, time_idx = self.get_linear_data(self.train_data)
-        return [[i] for i in range(self.train_len)], data, time_idx
-
-    def get_linear_test_data(self):
-        data, time_idx = self.get_linear_data(self.test_data)
-        return [[i] for i in range(self.train_len, self.train_len + self.test_len, 1)], data, time_idx
-
-    @staticmethod
-    def get_linear_data(data):
-        return np.array(data)[:, [1]].ravel(), [[i] for i in data.index.values]

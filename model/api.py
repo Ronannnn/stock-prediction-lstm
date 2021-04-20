@@ -1,6 +1,7 @@
 from model.data_processor import DataLoader
 from model.nn import NNModel
 from model.util import Timer, load_config
+import numpy as np
 
 steps = []
 
@@ -37,6 +38,7 @@ def get_plot_data(params):
     y_pred = model.predict(x_test)
     min_max_scaler = data.get_min_max_scaler()
     y_test = min_max_scaler.inverse_transform(y_test)
+    y_test = np.append(y_test, [[-1]], axis=0)  # add empty value so it has the same size as y_pred and date
     y_pred = min_max_scaler.inverse_transform(y_pred)
     res = []
     for i in range(len(y_pred)):

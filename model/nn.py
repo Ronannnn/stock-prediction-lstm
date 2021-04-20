@@ -145,10 +145,10 @@ def nn_model_test():
             y_pred = model.build_train_predict(x_train, y_train, x_test, model_config['epochs'], model_config['batch_size'])
             min_max_scaler = data.get_min_max_scaler()
             y_test = min_max_scaler.inverse_transform(y_test)
-            y_pred = min_max_scaler.inverse_transform(y_pred)
-            rmse, r = model.evaluate(y_test, y_pred)
+            y_pred = min_max_scaler.inverse_transform(y_pred)  # this contains one more data than y_test
+            rmse, r = model.evaluate(y_test, y_pred[:-1])
             res[stock_code] = "rmse: %s, r: %s, time: %s" % (str(rmse), str(r), total_timer.stop())
-            plot_pred_true_result(date_test, y_pred.ravel(), y_test.ravel())
+            plot_pred_true_result(date_test[:-1], y_pred[:-1].ravel(), y_test.ravel())
             # model.find_best_epoch(1, 40, 1, x_train, y_train, x_pred, y_true)
             # model.find_best_batch_size(0, 300, 10, x_train, y_train, x_pred, y_true)
     for key in res:
