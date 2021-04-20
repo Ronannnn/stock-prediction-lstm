@@ -83,7 +83,9 @@ class DataLoader:
         x_test = windowed_data[split_num:, :-1]  # use the last window to predict next future day
         y_test = windowed_data[split_num:-1, -1, [close_idx]]
         date_test = windowed_date_idx[split_num:, -1]
-        return x_train, y_train, date_train, x_test, y_test, date_test
+        return x_train, y_train, date_train, \
+               x_test, y_test, date_test, \
+               self.raw_data.get(['Open', 'Close', 'Low', 'High']).iloc[-len(date_test):]
 
     def get_min_max_scaler(self):
         close_idx = list(self.data.columns).index('Close')

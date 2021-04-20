@@ -139,7 +139,7 @@ def nn_model_test():
             if model_config['include'] is False:
                 continue
             model = NNModel(data_config, model_config, data.get_columns_num())
-            x_train, y_train, date_train, x_test, y_test, date_test = data.get_windowed_data()
+            x_train, y_train, date_train, x_test, y_test, date_test, _ = data.get_windowed_data()
             total_timer = Timer()
             total_timer.reset()
             y_pred = model.build_train_predict(x_train, y_train, x_test, model_config['epochs'], model_config['batch_size'])

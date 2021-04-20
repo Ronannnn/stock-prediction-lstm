@@ -26,7 +26,7 @@ def get_plot_data(params):
     model.build()
     steps.append(timer.stop())
 
-    x_train, y_train, date_train, x_test, y_test, date_test = data.get_windowed_data()
+    x_train, y_train, date_train, x_test, y_test, date_test, k_line_data = data.get_windowed_data()
 
     # train
     timer.reset()
@@ -42,7 +42,15 @@ def get_plot_data(params):
     y_pred = min_max_scaler.inverse_transform(y_pred)
     res = []
     for i in range(len(y_pred)):
-        res.append([str(date_test[i])[0: 10], str(y_test[i][0]), str(y_pred[i][0])])
+        res.append([
+            str(date_test[i])[0: 10],  # date
+            y_test[i][0],  # y_test
+            y_pred[i][0],  # y_pred
+            k_line_data.iloc[i, 0],  # Open
+            k_line_data.iloc[i, 1],  # Close
+            k_line_data.iloc[i, 2],  # Low
+            k_line_data.iloc[i, 3],  # High
+        ])
     steps.append(timer.stop())
     rmse, r2 = model.evaluate(y_test, y_pred)
     return res, rmse, r2
