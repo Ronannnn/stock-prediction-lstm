@@ -6,12 +6,19 @@ import quandl
 import yfinance as yf
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
+import errno
 
 # for us dollar index
 quandl.ApiConfig.api_key = 'ZmqDKDtks_xNKfdQv-b4'
 datetime_fmt = '%Y-%m-%d'
+data_dir = "model/data/"
+stock_data_dir = data_dir + "stock/"
+senti_data_dir = data_dir + "sentiment/"
+other_data_dir = data_dir + "other/"
 
 
+# 15-01-01 20-01-01
+# 20-01-01 21-01-01
 class DataLoader:
     def __init__(self, config):
         self.stock_code = config["stock_code"]
@@ -23,7 +30,20 @@ class DataLoader:
         self.normalizable = config["normalizable"]
         self.days_for_predict = config["days_for_predict"]
         self.days_to_predict = config["days_to_predict"]
+        # init dir before fetch data
+        self.init_paths([stock_data_dir, senti_data_dir, other_data_dir])
         self.raw_data, self.data, self.date_idx = self.fetch_data()
+
+    @staticmethod
+    def init_paths(dirs):
+        for dirname in dirs:
+            print(dirname)
+            if not os.path.exists(os.path.dirname(dirname)):
+                try:
+                    os.makedirs(os.path.dirname(dirname))
+                except OSError as exc:  # Guard against race condition
+                    if exc.errno != errno.EEXIST:
+                        raise
 
     def fetch_data(self):
         stock = self.fetch_yf_stock()
@@ -32,27 +52,27 @@ class DataLoader:
         return merged_data, self.normalize(merged_data, self.normalizable), merged_data.index.values
 
     def fetch_yf_stock(self):
-        data_filename = "model/data/%s_%s_%s.csv" % (self.stock_code, self.start, self.end)
-        if not os.path.exists(data_filename):
+        filename = "%s%s_%s_%s.csv" % (stock_data_dir, self.stock_code, self.start, self.end)
+        if not os.path.exists(filename):
             stock_data = yf.download(self.stock_code, start=self.start, end=self.end)
             if len(stock_data) == 0:
                 raise Exception("No data for stock code %s" % self.stock_code)
-            stock_data.to_csv(data_filename)
-        return pd.read_csv(data_filename, index_col=0)  # todo why return stock_data from first if is not ok
+            stock_data.to_csv(filename)
+        return pd.read_csv(filename, index_col=0)  # todo why return stock_data from first if is not ok
 
     def fetch_us_dollar_idx(self):
         """
         https://www.quandl.com/data/CHRIS/ICE_DX1-US-Dollar-Index-Futures-Continuous-Contract-1-DX1-Front-Month
         :return:
         """
-        data_filename = "model/data/%s_%s_%s.csv" % ('ice-dx1', self.start, self.end)
-        if not os.path.exists(data_filename):
+        filename = "%s%s_%s_%s.csv" % (other_data_dir, 'ice-dx1', self.start, self.end)
+        if not os.path.exists(filename):
             ice_dx = quandl.get("CHRIS/ICE_DX1", start_date=self.start, end_date=self.end)
             ice_dx = ice_dx.get(["Settle"])
             if len(ice_dx) == 0:
                 raise Exception("No data for stock code %s" % self.stock_code)
-            ice_dx.to_csv(data_filename)
-        return pd.read_csv(data_filename, index_col=0)
+            ice_dx.to_csv(filename)
+        return pd.read_csv(filename, index_col=0)
 
     def get_columns_num(self):
         return self.data.shape[1]
