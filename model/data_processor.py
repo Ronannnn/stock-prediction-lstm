@@ -48,7 +48,10 @@ class DataLoader:
     def fetch_data(self):
         stock = self.fetch_yf_stock()
         us_dollar_idx = self.fetch_us_dollar_idx()
+        senti_score = self.fetch_senti_score()
         merged_data = stock.merge(us_dollar_idx, left_index=True, right_index=True)
+        if not senti_score.empty:
+            merged_data = merged_data.merge(senti_score, left_index=True, right_index=True)
         return merged_data, self.normalize(merged_data, self.normalizable), merged_data.index.values
 
     def fetch_yf_stock(self):
@@ -73,6 +76,18 @@ class DataLoader:
                 raise Exception("No data for stock code %s" % self.stock_code)
             ice_dx.to_csv(filename)
         return pd.read_csv(filename, index_col=0)
+
+    def fetch_senti_score(self):
+        """
+        Sentiment Analysis Score
+        :return:
+        """
+        filename = "%s%s.csv" % (senti_data_dir, self.stock_code.upper())
+        if not os.path.exists(filename):
+            return pd.DataFrame()
+        df = pd.read_csv(filename, index_col=0)
+        df.index = pd.to_datetime(df.index, format='%d-%b-%y').strftime('%Y-%m-%d')
+        return df
 
     def get_columns_num(self):
         return self.data.shape[1]
