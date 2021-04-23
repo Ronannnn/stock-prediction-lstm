@@ -13,8 +13,8 @@ quandl.ApiConfig.api_key = 'ZmqDKDtks_xNKfdQv-b4'
 datetime_fmt = '%Y-%m-%d'
 data_dir = "model/data/"
 stock_data_dir = data_dir + "stock/"
-senti_data_dir = data_dir + "sentiment/"
 other_data_dir = data_dir + "other/"
+senti_data_dir = "model/sentiment/scores/"
 
 
 # 15-01-01 20-01-01
@@ -30,6 +30,7 @@ class DataLoader:
         self.normalizable = config["normalizable"]
         self.days_for_predict = config["days_for_predict"]
         self.days_to_predict = config["days_to_predict"]
+        self.impl_sentiment = config["impl_sentiment"]
         # init dir before fetch data
         self.init_paths([stock_data_dir, senti_data_dir, other_data_dir])
         self.raw_data, self.data, self.date_idx = self.fetch_data()
@@ -37,7 +38,6 @@ class DataLoader:
     @staticmethod
     def init_paths(dirs):
         for dirname in dirs:
-            print(dirname)
             if not os.path.exists(os.path.dirname(dirname)):
                 try:
                     os.makedirs(os.path.dirname(dirname))
@@ -48,9 +48,11 @@ class DataLoader:
     def fetch_data(self):
         stock = self.fetch_yf_stock()
         us_dollar_idx = self.fetch_us_dollar_idx()
-        senti_score = self.fetch_senti_score()
         merged_data = stock.merge(us_dollar_idx, left_index=True, right_index=True)
-        if not senti_score.empty:
+        if self.impl_sentiment:
+            senti_score = self.fetch_senti_score()
+            if senti_score.empty:
+                raise
             merged_data = merged_data.merge(senti_score, left_index=True, right_index=True)
         return merged_data, self.normalize(merged_data, self.normalizable), merged_data.index.values
 
@@ -83,6 +85,7 @@ class DataLoader:
         :return:
         """
         filename = "%s%s.csv" % (senti_data_dir, self.stock_code.upper())
+        print(filename)
         if not os.path.exists(filename):
             return pd.DataFrame()
         df = pd.read_csv(filename, index_col=0)
