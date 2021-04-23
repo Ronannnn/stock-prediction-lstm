@@ -20,12 +20,13 @@
       "NFLX"
     ],
     "stock_code": "AAPL",
-    "start": "2012-05-18",
-    "end": "2020-07-23",
+    "start": "2020-01-01",
+    "end": "2021-03-01",
     "train_test_split": 0.75,
     "days_for_predict": 50,
     "days_to_predict": 1,
     "normalizable": true,
+    "impl_sentiment": true,
     "save_dir": "saved_models",
     "verbose": 2
   },
@@ -71,7 +72,7 @@
       "name": "lstm_model",
       "include": true,
       "epochs": 50,
-      "batch_size": 64,
+      "batch_size": 30,
       "optimizer": "adam",
       "layers": [
         {
