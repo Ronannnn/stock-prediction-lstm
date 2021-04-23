@@ -17,7 +17,6 @@ from utils import load_config
 import time
 import sklearn
 import math
-#from data_processor import DataLoader.fetch_senti_score
 class Model:
     def __init__(
         self,
@@ -163,10 +162,7 @@ def forecast():
         init_value = last_state
         output_predict[-future_day + i] = out_logits[-1]
         date_ori.append(date_ori[-1] + timedelta(days = 1))
-    #print('111',output_predict)
-    #print(len(output_predict))
     output_predict = minmax.inverse_transform(output_predict)
-    #print('222',output_predict)
     deep_future = anchor(output_predict[:, 0], 0.3)
     
     return deep_future[-test_size:]
@@ -184,8 +180,6 @@ def fetch_senti_score(stock_code):
     return df
 #time start
 start_time = time.time()
-#sns.set()
-#tf.compat.v1.random.set_random_seed(1234)
 config = load_config()
 data_config = config['data']
 start = data_config["start"]
@@ -194,8 +188,6 @@ for stock_code in data_config['stock_code_list']:
     print("---------------")
     print("Stock Code: %s" % stock_code)
     data_config['stock_code'] = stock_code
-    #data = DataLoader(data_config)
-    #stock_code = config['data']["stock_code"]
     senti_df = fetch_senti_score(stock_code)
     df = yf.download(stock_code,start=start,end=end)
     
@@ -209,11 +201,9 @@ for stock_code in data_config['stock_code_list']:
         df = df[['Date','Open','High','Low','Close','Adj Close','Volume','score']]
     else:
         df = df[['Date','Open','High','Low','Close','Adj Close','Volume']]
-    #df.head()
     minmax = MinMaxScaler().fit(df.iloc[:, 4:5].astype('float32')) # Close index
     df_log = minmax.transform(df.iloc[:, 4:5].astype('float32')) # Close index
     df_log = pd.DataFrame(df_log)
-    #df_log.head()
     train_test_split = data_config['train_test_split']
     lendf = len(df)
     test_size = int((1-train_test_split)*lendf)
@@ -222,7 +212,6 @@ for stock_code in data_config['stock_code_list']:
     future_day = test_size
     for model_config in config['models']:
         if model_config['name'] == "seq2seq_model":
-            #df.shape, df_train.shape, df_test.shape
             simulation_size = model_config["simulation_size"]
             num_layers = model_config['num_layers']
             size_layer = model_config['batch_size']
