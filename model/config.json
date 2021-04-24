@@ -17,7 +17,9 @@
       "INTC",
       "DELL",
       "ADBE",
-      "NFLX"
+      "NFLX",
+      "QQQ",
+      "XLK"
     ],
     "stock_code": "AAPL",
     "start": "2020-01-01",
@@ -110,9 +112,14 @@
     {
       "name": "seq2seq_model",
       "include": false,
-      "epochs": 20,
-      "batch_size": 50,
+      "epochs": 50,
+      "batch_size": 128,
       "optimizer": "adam",
+      "timestamp":5,
+      "dropout_rate":0.5,
+      "num_layers":1,
+      "learning_rate":0.003,
+      "simulation_size":10,
       "layers": [
         {
           "type": "lstm",

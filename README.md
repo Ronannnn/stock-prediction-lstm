@@ -28,3 +28,8 @@ Google GOOGL
 ## Model Reference
 [Linear SVM first Reference](https://github.com/chaitjo/regression-stock-prediction/blob/master/svr.py)
 [Encoder Decoder LSTM](https://deepdatainsight.com/stock-market-prediction-approaches/)
+
+## Docker build and push
+1. build docker image: `docker build -t ronannnn/dsci560-profitdance-backend:latest .`
+2. push to Ronan's docker hub: `docker push ronannnn/dsci560-profitdance-backend:latest`
+3. run container in server `docker run -d --rm --name backend -p 8000:8000 <image id>`
