@@ -11,7 +11,7 @@ from keras.metrics import MeanAbsolutePercentageError, RootMeanSquaredError
 from model.data_processor import DataLoader
 from model.model_abc import Model
 
-from model.util import load_config, plot_pred_true_result, Timer
+from model.util import load_config, plot_pred_true_result2, Timer
 
 
 def new_dense(layer_config):
@@ -143,12 +143,21 @@ def nn_model_test():
             total_timer = Timer()
             total_timer.reset()
             y_pred = model.build_train_predict(x_train, y_train, x_test, model_config['epochs'], model_config['batch_size'])
+
+            model.days_to_predict = 2
+            y_pred2 = model.build_train_predict(x_train, y_train, x_test, model_config['epochs'], model_config['batch_size'])
+
             min_max_scaler = data.get_min_max_scaler()
             y_test = min_max_scaler.inverse_transform(y_test)
             y_pred = min_max_scaler.inverse_transform(y_pred)  # this contains one more data than y_test
+            y_pred2 = min_max_scaler.inverse_transform(y_pred2)
             rmse, r = model.evaluate(y_test, y_pred[:-1])
-            res[stock_code] = "rmse: %s, r: %s, time: %s" % (str(rmse), str(r), total_timer.stop())
-            plot_pred_true_result(date_test[:-1], y_pred[:-1].ravel(), y_test.ravel())
+
+            rmse_2, r_2 = model.evaluate(y_test, y_pred2[:-1])
+
+            res[stock_code] = "rmse: %s, r: %s, time: %s,\n rmse_2:%s, r_2:%s" % (str(rmse), str(r), total_timer.stop(), rmse_2, r_2)
+
+            plot_pred_true_result2(date_test[:-1], y_pred[:-1].ravel(), y_test.ravel(), y_pred2.ravel()[:-1])
             # model.find_best_epoch(1, 40, 1, x_train, y_train, x_pred, y_true)
             # model.find_best_batch_size(0, 300, 10, x_train, y_train, x_pred, y_true)
     for key in res:

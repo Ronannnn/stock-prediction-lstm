@@ -8,16 +8,7 @@
   },
   "data": {
     "stock_code_list": [
-      "AAPL",
-      "GOOG",
-      "FB",
-      "AMZN",
-      "ORCL",
-      "MSFT",
-      "INTC",
-      "DELL",
-      "ADBE",
-      "NFLX"
+      "AAPL","GOOG","AMZN","MSFT","DELL","FB","INTC","ADBE","NFLX","QQQ","XLK","ORCL"
     ],
     "stock_code": "AAPL",
     "start": "2020-01-01",
@@ -26,7 +17,7 @@
     "days_for_predict": 50,
     "days_to_predict": 1,
     "normalizable": true,
-    "impl_sentiment": true,
+    "impl_sentiment": false,
     "save_dir": "saved_models",
     "verbose": 2
   },

@@ -42,6 +42,14 @@ def plot(time_idx, data):
 
 def plot_pred_true_result(time_idx, y_pred, y_true):
     plot(time_idx, {
-        "pred data": y_pred,
-        "true data": y_true
+        "pred data 1day": y_pred,
+        "true data": y_true,
     })
+
+def plot_pred_true_result2(time_idx, y_pred, y_true, y_pred2):
+    plot(time_idx, {
+        "pred data 1day": y_pred,
+        "true data": y_true,
+        "pred data 2day": y_pred2
+    })
+

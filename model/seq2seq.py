@@ -13,7 +13,7 @@ from sklearn.preprocessing import MinMaxScaler
 from datetime import datetime
 from datetime import timedelta
 from tqdm import tqdm
-from utils import load_config
+from util import load_config
 import time
 import sklearn
 import math
