@@ -151,15 +151,11 @@ def nn_model_test():
             y_test = min_max_scaler.inverse_transform(y_test)
             y_pred = min_max_scaler.inverse_transform(y_pred)  # this contains one more data than y_test
             y_pred2 = min_max_scaler.inverse_transform(y_pred2)
-            rmse, r = model.evaluate(y_test, y_pred[:-1])
-
-            rmse_2, r_2 = model.evaluate(y_test, y_pred2[:-1])
-
-            res[stock_code] = "rmse: %s, r: %s, time: %s,\n rmse_2:%s, r_2:%s" % (str(rmse), str(r), total_timer.stop(), rmse_2, r_2)
-
-            plot_pred_true_result2(date_test[:-1], y_pred[:-1].ravel(), y_test.ravel(), y_pred2.ravel()[:-1])
-            # model.find_best_epoch(1, 40, 1, x_train, y_train, x_pred, y_true)
-            # model.find_best_batch_size(0, 300, 10, x_train, y_train, x_pred, y_true)
+            rmse1, mae1, r21 = model.evaluate(y_test, y_pred[:-1])
+            rmse2, mae2, r22 = model.evaluate(y_test, y_pred2[:-1])
+            res[stock_code] = "[rmse: %s, mae: %s, r2: %s], [rmse_2:%s, mae_2: %s, r_2: %s], time: %s" % \
+                              (str(rmse1), str(mae1), str(r21), str(rmse2), str(mae2), str(r22), total_timer.stop())
+            # plot_pred_true_result2(date_test[:-1], y_pred[:-1].ravel(), y_test.ravel(), y_pred2.ravel()[:-1])
     for key in res:
         print(key, res[key])
 

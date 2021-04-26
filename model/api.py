@@ -52,5 +52,5 @@ def get_plot_data(params):
             k_line_data.iloc[i, 3],  # High
         ])
     steps.append(timer.stop())
-    rmse, r2 = model.evaluate(y_test, y_pred)
+    rmse, mae, r2 = model.evaluate(y_test, y_pred)
     return res, rmse, r2

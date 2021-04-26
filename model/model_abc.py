@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABCMeta
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 from model.util import Timer, plot
 import numpy as np
@@ -40,10 +40,11 @@ class Model(object):
     def evaluate(y_true, y_pred):
         rmse = mean_squared_error(y_true, y_pred, squared=False)
         print('[Model] Evaluate with RMSE: %s' % rmse)
-        # coefficient of correlation
+        mae = mean_absolute_error(y_true, y_pred)
+        print('[Model] Evaluate with MAE: %s' % mae)
         r2 = 1 - np.sum(np.square(y_true - y_pred)) / np.sum(np.square(y_true - np.mean(y_true)))
-        print('[Model] Evaluate with R: %s' % r2)
-        return rmse, r2
+        print('[Model] Evaluate with R2: %s' % r2)
+        return round(rmse, 3), round(mae, 3), round(r2, 3)
 
     def find_best_epoch(self, min_epochs, max_epochs, step, x_train, y_train, x_pred, y_true):
         epoch_loss_time = []
