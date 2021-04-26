@@ -1,0 +1,11 @@
+Django==3.2
+django-cors-headers==3.7.0
+djangorestframework==3.12.4
+Keras==2.4.3
+numpy==1.19.2
+pandas==1.2.4
+scikit-learn==0.24.1
+tensorflow==2.4.1
+yfinance==0.1.59
+Quandl==3.6.1
+matplotlib==3.4.1

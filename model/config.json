@@ -8,7 +8,22 @@
   },
   "data": {
     "stock_code_list": [
+<<<<<<< HEAD
       "AAPL","GOOG","AMZN","MSFT","DELL","FB","INTC","ADBE","NFLX","QQQ","XLK","ORCL"
+=======
+      "AAPL",
+      "GOOG",
+      "FB",
+      "AMZN",
+      "ORCL",
+      "MSFT",
+      "INTC",
+      "DELL",
+      "ADBE",
+      "NFLX",
+      "QQQ",
+      "XLK"
+>>>>>>> 34df40b869ca5df570fda7471927a8eccb7cdba6
     ],
     "stock_code": "AAPL",
     "start": "2020-01-01",
@@ -101,9 +116,14 @@
     {
       "name": "seq2seq_model",
       "include": false,
-      "epochs": 20,
-      "batch_size": 50,
+      "epochs": 50,
+      "batch_size": 128,
       "optimizer": "adam",
+      "timestamp":5,
+      "dropout_rate":0.5,
+      "num_layers":1,
+      "learning_rate":0.003,
+      "simulation_size":10,
       "layers": [
         {
           "type": "lstm",
