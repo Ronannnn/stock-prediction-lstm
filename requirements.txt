@@ -9,3 +9,7 @@ tensorflow==2.4.1
 yfinance==0.1.59
 Quandl==3.6.1
 matplotlib==3.4.1
+
+seaborn~=0.11.1
+sklearn~=0.0
+tqdm~=4.60.0

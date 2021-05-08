@@ -7,6 +7,9 @@ import yfinance as yf
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 import errno
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 
 # for us dollar index
 quandl.ApiConfig.api_key = 'ZmqDKDtks_xNKfdQv-b4'
@@ -34,6 +37,10 @@ class DataLoader:
         # init dir before fetch data
         self.init_paths([stock_data_dir, senti_data_dir, other_data_dir])
         self.raw_data, self.data, self.date_idx = self.fetch_data()
+        # plot heatmap
+        sns.set()
+        ax = sns.heatmap(self.raw_data.corr())
+        plt.show()
 
     @staticmethod
     def init_paths(dirs):
