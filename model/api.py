@@ -9,9 +9,10 @@ steps = []
 def get_plot_data(params):
     timer = Timer()
     config = load_config()
-    config['data']['stock_code'] = params['stockCode']
-    config['data']['start'] = params['date'][0][0:10]
-    config['data']['end'] = params['date'][1][0:10]
+    data_config = config['data']
+    data_config['stock_code'] = params['stockCode']
+    data_config['start'] = params['date'][0][0:10]
+    data_config['end'] = params['date'][1][0:10]
 
     # data loader
     timer.reset()
@@ -20,8 +21,7 @@ def get_plot_data(params):
 
     # model builder
     timer.reset()
-    data_config = config["data"]
-    model_config = config["models"][1]
+    model_config = config["models"][0]
     model = NNModel(data_config, model_config, data.get_columns_num())
     model.build()
     steps.append(timer.stop())
@@ -52,5 +52,5 @@ def get_plot_data(params):
             k_line_data.iloc[i, 3],  # High
         ])
     steps.append(timer.stop())
-    rmse, mae, r2 = model.evaluate(y_test, y_pred)
+    rmse, r2 = model.evaluate(y_test, y_pred)
     return res, rmse, r2

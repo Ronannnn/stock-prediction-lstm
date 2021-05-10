@@ -20,8 +20,6 @@ other_data_dir = data_dir + "other/"
 senti_data_dir = "model/sentiment/scores/"
 
 
-# 15-01-01 20-01-01
-# 20-01-01 21-01-01
 class DataLoader:
     def __init__(self, config):
         self.stock_code = config["stock_code"]
@@ -34,13 +32,10 @@ class DataLoader:
         self.days_for_predict = config["days_for_predict"]
         self.days_to_predict = config["days_to_predict"]
         self.impl_sentiment = config["impl_sentiment"]
-        # init dir before fetch data
-        self.init_paths([stock_data_dir, senti_data_dir, other_data_dir])
         self.raw_data, self.data, self.date_idx = self.fetch_data()
-        # plot heatmap
-        sns.set()
-        sns.heatmap(self.raw_data.corr())
-        plt.show()
+        if config["heatmap"] is True:
+            print("Heatmap plotted")
+            self.plot_heatmap()
 
     @staticmethod
     def init_paths(dirs):
@@ -53,6 +48,7 @@ class DataLoader:
                         raise
 
     def fetch_data(self):
+        self.init_paths([stock_data_dir, senti_data_dir, other_data_dir])
         stock = self.fetch_yf_stock()
         us_dollar_idx = self.fetch_us_dollar_idx()
         merged_data = stock.merge(us_dollar_idx, left_index=True, right_index=True)
@@ -138,3 +134,8 @@ class DataLoader:
         min_max_scaler = MinMaxScaler()
         min_max_scaler.fit(np.array(self.raw_data)[:, [close_idx]])
         return min_max_scaler
+
+    def plot_heatmap(self):
+        sns.set()
+        sns.heatmap(self.raw_data.corr())
+        plt.show()

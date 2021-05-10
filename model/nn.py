@@ -11,7 +11,7 @@ from keras.metrics import MeanAbsolutePercentageError, RootMeanSquaredError
 from model.data_processor import DataLoader
 from model.model_abc import Model
 
-from model.util import load_config, Timer
+from model.util import load_config
 
 
 def new_dense(layer_config):
@@ -95,7 +95,7 @@ class NNModel(Model):
     def load(self, file):
         self.model = load_model(file)
 
-    def build(self):
+    def build(self, print_model=False):
         self.model = Sequential()
         for layer_config in self.model_config['layers']:
             if layer_config['type'] == 'lstm':
@@ -104,7 +104,8 @@ class NNModel(Model):
                 break
         for layer_config in self.model_config['layers']:
             self.model.add(layer_dict[layer_config['type']](layer_config))
-        print(self.model.summary())
+        if print_model:
+            print(self.model.summary())
         self.model.compile(
             loss=keras.losses.MeanSquaredError(),
             optimizer=Adam(learning_rate=0.01),
@@ -113,51 +114,49 @@ class NNModel(Model):
 
     def train(self, X, y, epochs, batch_size):
         callbacks = [
-            # EarlyStopping(monitor='loss', patience=3),  # Stop after 2 epochs whose loss is no longer decreasing
+            EarlyStopping(monitor='loss', patience=5),  # Stop after 2 epochs whose loss is no longer decreasing
             # ModelCheckpoint(self.filename, monitor='loss', save_best_only=True)  # monitor is 'loss' not 'val_loss'
         ]
-        print('[Model] %s epochs, %s batch size' % (epochs, batch_size))
-        self.model.fit(X, y, epochs=epochs, batch_size=batch_size, callbacks=callbacks, verbose=self.verbose,
-                       shuffle=False)
+        print('\tEpochs: %s, Batch size: %s' % (epochs, batch_size))
+        self.model.fit(
+            X, y, epochs=epochs, batch_size=batch_size, callbacks=callbacks, verbose=self.verbose, shuffle=False)
         # https://github.com/keras-team/keras/issues/2768
-        print('[Model] Training Completed. Model saved as %s' % self.filename)
+        print('\tModel saved as %s' % self.filename)
 
     def predict(self, X):
         return self.model.predict(X, batch_size=self.model_config['batch_size'])
 
 
-def nn_model_test():
+def run_from_configs(data_config, model_config):
+    print("------Implement on Stock Symbol '%s' and model '%s'-----" % (data_config["stock_code"], model_config["name"]))
+    data = DataLoader(data_config)
+    model = NNModel(data_config, model_config, data.get_columns_num())
+    x_train, y_train, date_train, x_test, y_test, date_test, _ = data.get_windowed_data()
+    return model.learn(
+        x_train,
+        y_train,
+        x_test,
+        y_test,
+        date_test,
+        data.get_min_max_scaler(),
+        model_config['epochs'],
+        model_config['batch_size']
+    )
+
+
+def run():
     config = load_config()
-    data_config = config['data']
+    stock_code_list = config['stock_code_list']
     res = {}
-    for stock_code in data_config['stock_code_list']:
-        print("---------------")
-        print("Stock Code: %s" % stock_code)
+    data_config = config['data']
+    for stock_code in stock_code_list:
         data_config['stock_code'] = stock_code
-        data = DataLoader(data_config)
         for model_config in config['models']:
-            if model_config['include'] is False:
-                continue
-            model = NNModel(data_config, model_config, data.get_columns_num())
-            x_train, y_train, date_train, x_test, y_test, date_test, _ = data.get_windowed_data()
-            total_timer = Timer()
-            total_timer.reset()
-            y_pred = model.build_train_predict(x_train, y_train, x_test, model_config['epochs'], model_config['batch_size'])
-
-            model.days_to_predict = 2
-            y_pred2 = model.build_train_predict(x_train, y_train, x_test, model_config['epochs'], model_config['batch_size'])
-
-            min_max_scaler = data.get_min_max_scaler()
-            y_test = min_max_scaler.inverse_transform(y_test)
-            y_pred = min_max_scaler.inverse_transform(y_pred)  # this contains one more data than y_test
-            y_pred2 = min_max_scaler.inverse_transform(y_pred2)
-            rmse1, mae1, r21 = model.evaluate(y_test, y_pred[:-1])
-            rmse2, mae2, r22 = model.evaluate(y_test, y_pred2[:-1])
-            res[stock_code] = "[rmse: %s, mae: %s, r2: %s], [rmse_2:%s, mae_2: %s, r_2: %s], time: %s" % \
-                              (str(rmse1), str(mae1), str(r21), str(rmse2), str(mae2), str(r22), total_timer.stop())
+            if model_config['include'] is True:
+                res[stock_code] = run_from_configs(data_config, model_config)
     for key in res:
         print(key, res[key])
 
 
 if __name__ == '__main__':
-    nn_model_test()
+    run()

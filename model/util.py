@@ -40,8 +40,8 @@ def plot(time_idx, data):
     plt.show()
 
 
-def plot_pred_true_result(time_idx, y_pred, y_true):
+def plot_pred_true_result(time_idx, y_true, y_pred):
     plot(time_idx, {
-        "pred data 1day": y_pred,
         "true data": y_true,
+        "1-day pred": y_pred,
     })

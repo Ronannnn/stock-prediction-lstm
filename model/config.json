@@ -1,13 +1,5 @@
 {
-  "mysql": {
-    "host": "localhost",
-    "user": "root",
-    "password": "699685",
-    "raise_on_warnings": true,
-    "database": "dsci560"
-  },
-  "data": {
-    "stock_code_list": [
+  "stock_code_list": [
       "ORCL",
       "INTC",
       "DELL",
@@ -17,7 +9,8 @@
       "SOHU",
       "NTES"
     ],
-    "stock_code": "AAPL",
+  "data": {
+    "stock_code": "",
     "start": "2020-01-01",
     "end": "2021-03-01",
     "train_test_split": 0.75,
@@ -26,48 +19,12 @@
     "normalizable": true,
     "impl_sentiment": false,
     "save_dir": "saved_models",
-    "verbose": 2
+    "verbose": 0,
+    "heatmap": false
   },
   "models": [
     {
-      "name": "from_github",
-      "include": false,
-      "epochs": 30,
-      "batch_size": 64,
-      "optimizer": "adam",
-      "layers": [
-        {
-          "type": "lstm",
-          "neuron_num": 180,
-          "return_seq": true
-        },
-        {
-          "type": "dropout",
-          "rate": 0.2
-        },
-        {
-          "type": "lstm",
-          "neuron_num": 100,
-          "return_seq": true
-        },
-        {
-          "type": "lstm",
-          "neuron_num": 100,
-          "return_seq": false
-        },
-        {
-          "type": "dropout",
-          "rate": 0.2
-        },
-        {
-          "type": "dense",
-          "neuron_num": 1,
-          "activation": "linear"
-        }
-      ]
-    },
-    {
-      "name": "lstm_model",
+      "name": "vanilla_lstm",
       "include": true,
       "epochs": 50,
       "batch_size": 30,
@@ -86,27 +43,7 @@
       ]
     },
     {
-      "name": "dense_model",
-      "include": false,
-      "epochs": 20,
-      "batch_size": 50,
-      "optimizer": "adam",
-      "layers": [
-        {
-          "type": "dense",
-          "neuron_num": 13,
-          "kernel_initializer": "normal",
-          "activation": "relu"
-        },
-        {
-          "type": "dense",
-          "neuron_num": 1,
-          "kernel_initializer": "normal"
-        }
-      ]
-    },
-    {
-      "name": "seq2seq_model",
+      "name": "seq2seq",
       "include": false,
       "epochs": 50,
       "batch_size": 128,
