@@ -5,3 +5,4 @@ docker-compose.yml
 *.iml
 .idea
 model/data
+.DS_Store

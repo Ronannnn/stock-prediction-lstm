@@ -11,7 +11,7 @@ from keras.metrics import MeanAbsolutePercentageError, RootMeanSquaredError
 from model.data_processor import DataLoader
 from model.model_abc import Model
 
-from model.util import load_config, plot_pred_true_result2, Timer
+from model.util import load_config, Timer
 
 
 def new_dense(layer_config):
@@ -155,7 +155,6 @@ def nn_model_test():
             rmse2, mae2, r22 = model.evaluate(y_test, y_pred2[:-1])
             res[stock_code] = "[rmse: %s, mae: %s, r2: %s], [rmse_2:%s, mae_2: %s, r_2: %s], time: %s" % \
                               (str(rmse1), str(mae1), str(r21), str(rmse2), str(mae2), str(r22), total_timer.stop())
-            # plot_pred_true_result2(date_test[:-1], y_pred[:-1].ravel(), y_test.ravel(), y_pred2.ravel()[:-1])
     for key in res:
         print(key, res[key])
 

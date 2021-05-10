@@ -39,7 +39,7 @@ class DataLoader:
         self.raw_data, self.data, self.date_idx = self.fetch_data()
         # plot heatmap
         sns.set()
-        ax = sns.heatmap(self.raw_data.corr())
+        sns.heatmap(self.raw_data.corr())
         plt.show()
 
     @staticmethod
